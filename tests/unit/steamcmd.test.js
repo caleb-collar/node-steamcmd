@@ -106,12 +106,16 @@ describe('steamcmd.js', () => {
     it('should return a Promise', () => {
       const result = steamcmd.ensureInstalled()
       expect(result).toBeInstanceOf(Promise)
+      // Catch to avoid unhandled rejection
+      result.catch(() => {})
     })
 
     it('should accept options object', () => {
       // Just verify it accepts options without throwing - don't await the actual install
       const result = steamcmd.ensureInstalled({ onProgress: () => {} })
       expect(result).toBeInstanceOf(Promise)
+      // Catch to avoid unhandled rejection
+      result.catch(() => {})
     })
   })
 

@@ -4,71 +4,71 @@
  * @private
  */
 
-import childProcess from "node:child_process";
-import { EventEmitter } from "node:events";
+import childProcess from 'node:child_process'
+import { EventEmitter } from 'node:events'
 
 /**
  * Progress information for install operations
  */
 export interface InstallProgress {
   /** Current phase of the operation */
-  phase: string;
+  phase: string
   /** Percentage complete (0-100) */
-  percent: number;
+  percent: number
   /** Number of bytes downloaded so far */
-  bytesDownloaded: number;
+  bytesDownloaded: number
   /** Total bytes to download (0 if unknown) */
-  totalBytes: number;
+  totalBytes: number
 }
 
 /**
  * Valid platform values for SteamCMD
  */
-export type SteamPlatform = "windows" | "macos" | "linux";
+export type SteamPlatform = 'windows' | 'macos' | 'linux'
 
 /**
  * Options for install operations
  */
 export interface InstallOptions {
   /** Steam application ID to install */
-  applicationId?: number | string;
+  applicationId?: number | string
   /** Workshop item ID to install (requires applicationId) */
-  workshopId?: number | string;
+  workshopId?: number | string
   /** Installation directory path */
-  path?: string;
+  path?: string
   /** Steam username for authentication */
-  username?: string;
+  username?: string
   /** Steam password for authentication */
-  password?: string;
+  password?: string
   /** Steam Guard code for two-factor authentication */
-  steamGuardCode?: string;
+  steamGuardCode?: string
   /** Target platform for download */
-  platform?: SteamPlatform;
+  platform?: SteamPlatform
   /** Progress callback */
-  onProgress?: (progress: InstallProgress) => void;
+  onProgress?: (progress: InstallProgress) => void
   /** Output callback */
-  onOutput?: (data: string, type: "stdout" | "stderr") => void;
+  onOutput?: (data: string, type: 'stdout' | 'stderr') => void
 }
 
 /**
  * Callback function type for install operations
  */
-export type InstallCallback = (error: Error | null) => void;
+export type InstallCallback = (error: Error | null) => void
 
 /**
  * Custom error class for installation failures
  */
 export class InstallError extends Error {
-  name = "InstallError" as const;
-  code: string;
-  exitCode?: number;
-  stdout?: string;
-  stderr?: string;
+  name = 'InstallError' as const
+  code: string
+  exitCode?: number
+  stdout?: string
+  stderr?: string
 
   constructor(message: string, code: string, exitCode?: number) {
-    super(message);
-    this.code = code;
-    this.exitCode = exitCode;
+    super(message)
+    this.code = code
+    this.exitCode = exitCode
   }
 }
 
@@ -76,27 +76,27 @@ export class InstallError extends Error {
  * EventEmitter for install operations with progress events
  */
 export interface InstallEmitter extends EventEmitter {
-  on(event: "progress", listener: (progress: InstallProgress) => void): this;
+  on(event: 'progress', listener: (progress: InstallProgress) => void): this
   on(
-    event: "output",
-    listener: (data: string, type: "stdout" | "stderr") => void,
-  ): this;
-  on(event: "complete", listener: () => void): this;
-  on(event: "error", listener: (error: InstallError) => void): this;
-  once(event: "progress", listener: (progress: InstallProgress) => void): this;
+    event: 'output',
+    listener: (data: string, type: 'stdout' | 'stderr') => void
+  ): this
+  on(event: 'complete', listener: () => void): this
+  on(event: 'error', listener: (error: InstallError) => void): this
+  once(event: 'progress', listener: (progress: InstallProgress) => void): this
   once(
-    event: "output",
-    listener: (data: string, type: "stdout" | "stderr") => void,
-  ): this;
-  once(event: "complete", listener: () => void): this;
-  once(event: "error", listener: (error: InstallError) => void): this;
-  emit(event: "progress", progress: InstallProgress): boolean;
-  emit(event: "output", data: string, type: "stdout" | "stderr"): boolean;
-  emit(event: "complete"): boolean;
-  emit(event: "error", error: InstallError): boolean;
+    event: 'output',
+    listener: (data: string, type: 'stdout' | 'stderr') => void
+  ): this
+  once(event: 'complete', listener: () => void): this
+  once(event: 'error', listener: (error: InstallError) => void): this
+  emit(event: 'progress', progress: InstallProgress): boolean
+  emit(event: 'output', data: string, type: 'stdout' | 'stderr'): boolean
+  emit(event: 'complete'): boolean
+  emit(event: 'error', error: InstallError): boolean
 }
 
-const VALID_PLATFORMS: readonly SteamPlatform[] = ["windows", "macos", "linux"];
+const VALID_PLATFORMS: readonly SteamPlatform[] = ['windows', 'macos', 'linux']
 
 /**
  * Validate installation options
@@ -104,63 +104,63 @@ const VALID_PLATFORMS: readonly SteamPlatform[] = ["windows", "macos", "linux"];
  * @throws {InstallError} If options are invalid
  */
 export function validateOptions(options: unknown): void {
-  if (!options || typeof options !== "object") {
-    throw new InstallError("Options must be an object", "INVALID_OPTIONS");
+  if (!options || typeof options !== 'object') {
+    throw new InstallError('Options must be an object', 'INVALID_OPTIONS')
   }
 
-  const opts = options as Record<string, unknown>;
+  const opts = options as Record<string, unknown>
 
-  if (opts["applicationId"] !== undefined) {
-    const appId = Number(opts["applicationId"]);
+  if (opts['applicationId'] !== undefined) {
+    const appId = Number(opts['applicationId'])
     if (Number.isNaN(appId) || appId <= 0 || !Number.isInteger(appId)) {
       throw new InstallError(
-        "applicationId must be a positive integer",
-        "INVALID_APP_ID",
-      );
+        'applicationId must be a positive integer',
+        'INVALID_APP_ID'
+      )
     }
   }
 
-  if (opts["workshopId"] !== undefined) {
-    if (!opts["applicationId"]) {
+  if (opts['workshopId'] !== undefined) {
+    if (!opts['applicationId']) {
       throw new InstallError(
-        "workshopId requires applicationId to be specified",
-        "MISSING_APP_ID",
-      );
+        'workshopId requires applicationId to be specified',
+        'MISSING_APP_ID'
+      )
     }
-    const workshopId = Number(opts["workshopId"]);
+    const workshopId = Number(opts['workshopId'])
     if (
       Number.isNaN(workshopId) ||
       workshopId <= 0 ||
       !Number.isInteger(workshopId)
     ) {
       throw new InstallError(
-        "workshopId must be a positive integer",
-        "INVALID_WORKSHOP_ID",
-      );
+        'workshopId must be a positive integer',
+        'INVALID_WORKSHOP_ID'
+      )
     }
   }
 
-  if (opts["platform"] !== undefined) {
-    if (!VALID_PLATFORMS.includes(opts["platform"] as SteamPlatform)) {
+  if (opts['platform'] !== undefined) {
+    if (!VALID_PLATFORMS.includes(opts['platform'] as SteamPlatform)) {
       throw new InstallError(
-        `platform must be one of: ${VALID_PLATFORMS.join(", ")}`,
-        "INVALID_PLATFORM",
-      );
+        `platform must be one of: ${VALID_PLATFORMS.join(', ')}`,
+        'INVALID_PLATFORM'
+      )
     }
   }
 
-  if (opts["password"] && !opts["username"]) {
+  if (opts['password'] && !opts['username']) {
     throw new InstallError(
-      "password requires username to be specified",
-      "MISSING_USERNAME",
-    );
+      'password requires username to be specified',
+      'MISSING_USERNAME'
+    )
   }
 
-  if (opts["steamGuardCode"] && !opts["username"]) {
+  if (opts['steamGuardCode'] && !opts['username']) {
     throw new InstallError(
-      "steamGuardCode requires username to be specified",
-      "MISSING_USERNAME",
-    );
+      'steamGuardCode requires username to be specified',
+      'MISSING_USERNAME'
+    )
   }
 }
 
@@ -170,56 +170,56 @@ export function validateOptions(options: unknown): void {
  * @returns Array of command line arguments
  */
 export function createArguments(options: InstallOptions): string[] {
-  const args: string[] = [];
+  const args: string[] = []
 
   // Force platform type for download
   if (options.platform) {
-    args.push(`+@sSteamCmdForcePlatformType ${options.platform}`);
+    args.push(`+@sSteamCmdForcePlatformType ${options.platform}`)
   }
 
   // Use supplied password
-  args.push("+@NoPromptForPassword 1");
+  args.push('+@NoPromptForPassword 1')
 
   // Quit on fail
-  args.push("+@ShutdownOnFailedCommand 1");
+  args.push('+@ShutdownOnFailedCommand 1')
 
   if (options.steamGuardCode) {
-    args.push(`+set_steam_guard_code ${options.steamGuardCode}`);
+    args.push(`+set_steam_guard_code ${options.steamGuardCode}`)
   }
 
   // Authentication
   if (options.username && options.password) {
-    args.push(`+login ${options.username} ${options.password}`);
+    args.push(`+login ${options.username} ${options.password}`)
   } else if (options.username) {
-    args.push(`+login ${options.username}`);
+    args.push(`+login ${options.username}`)
   } else {
-    args.push("+login anonymous");
+    args.push('+login anonymous')
   }
 
   // Installation directory
   if (options.path) {
-    args.push(`+force_install_dir "${options.path}"`);
+    args.push(`+force_install_dir "${options.path}"`)
   }
 
   // App id to install and/or validate
   if (options.applicationId && !options.workshopId) {
-    args.push(`+app_update ${options.applicationId} validate`);
+    args.push(`+app_update ${options.applicationId} validate`)
   }
 
   // Workshop id to install and/or validate
   if (options.applicationId && options.workshopId) {
     args.push(
-      "+workshop_download_item " +
+      '+workshop_download_item ' +
         options.applicationId +
-        " " +
-        options.workshopId,
-    );
+        ' ' +
+        options.workshopId
+    )
   }
 
   // Quit when done
-  args.push("+quit");
+  args.push('+quit')
 
-  return args;
+  return args
 }
 
 /**
@@ -228,44 +228,44 @@ export function createArguments(options: InstallOptions): string[] {
  * @returns Parsed progress info or null if not progress data
  */
 export function parseProgress(data: string | Buffer): InstallProgress | null {
-  const str = data.toString();
+  const str = data.toString()
 
   // Match update/download progress: "Update state (0x61) downloading, progress: 45.23 (1234567890 / 2732853760)"
   const updateMatch = str.match(
-    /Update state \(0x[\da-f]+\) (\w+), progress: ([\d.]+) \((\d+) \/ (\d+)\)/i,
-  );
+    /Update state \(0x[\da-f]+\) (\w+), progress: ([\d.]+) \((\d+) \/ (\d+)\)/i
+  )
   if (updateMatch) {
     return {
       phase: updateMatch[1]!.toLowerCase(),
       percent: Math.round(parseFloat(updateMatch[2]!)),
       bytesDownloaded: parseInt(updateMatch[3]!, 10),
       totalBytes: parseInt(updateMatch[4]!, 10),
-    };
+    }
   }
 
   // Match validation progress: "Validating: 45%"
-  const validateMatch = str.match(/Validating[^\d]*(\d+)%/i);
+  const validateMatch = str.match(/Validating[^\d]*(\d+)%/i)
   if (validateMatch) {
     return {
-      phase: "validating",
+      phase: 'validating',
       percent: parseInt(validateMatch[1]!, 10),
       bytesDownloaded: 0,
       totalBytes: 0,
-    };
+    }
   }
 
   // Match download progress: "[####    ] 45%"
-  const percentMatch = str.match(/\[(#+\s*)\]\s*(\d+)%/i);
+  const percentMatch = str.match(/\[(#+\s*)\]\s*(\d+)%/i)
   if (percentMatch) {
     return {
-      phase: "downloading",
+      phase: 'downloading',
       percent: parseInt(percentMatch[2]!, 10),
       bytesDownloaded: 0,
       totalBytes: 0,
-    };
+    }
   }
 
-  return null;
+  return null
 }
 
 /**
@@ -286,115 +286,115 @@ export function parseProgress(data: string | Buffer): InstallProgress | null {
 export function install(
   steamCmdPath: string,
   options: InstallOptions,
-  callback?: InstallCallback,
+  callback?: InstallCallback
 ): Promise<void> | void {
   // Support Promise-based usage
-  if (typeof callback !== "function") {
+  if (typeof callback !== 'function') {
     return new Promise((resolve, reject) => {
       install(steamCmdPath, options, (err) => {
-        if (err) reject(err);
-        else resolve();
-      });
-    });
+        if (err) reject(err)
+        else resolve()
+      })
+    })
   }
 
   // Validate options
   try {
-    validateOptions(options);
+    validateOptions(options)
   } catch (err) {
-    callback(err as InstallError);
-    return;
+    callback(err as InstallError)
+    return
   }
 
   // Validate steamCmdPath
-  if (!steamCmdPath || typeof steamCmdPath !== "string") {
+  if (!steamCmdPath || typeof steamCmdPath !== 'string') {
     callback(
       new InstallError(
-        "steamCmdPath must be a non-empty string",
-        "INVALID_PATH",
-      ),
-    );
-    return;
+        'steamCmdPath must be a non-empty string',
+        'INVALID_PATH'
+      )
+    )
+    return
   }
 
   const onProgress =
-    typeof options.onProgress === "function" ? options.onProgress : () => {};
+    typeof options.onProgress === 'function' ? options.onProgress : () => {}
   const onOutput =
-    typeof options.onOutput === "function" ? options.onOutput : null;
+    typeof options.onOutput === 'function' ? options.onOutput : null
 
-  const proc = childProcess.execFile(steamCmdPath, createArguments(options));
+  const proc = childProcess.execFile(steamCmdPath, createArguments(options))
 
-  let stdoutData = "";
-  let stderrData = "";
+  let stdoutData = ''
+  let stderrData = ''
 
   onProgress({
-    phase: "starting",
+    phase: 'starting',
     percent: 0,
     bytesDownloaded: 0,
     totalBytes: 0,
-  });
+  })
 
-  proc.stdout?.on("data", (data: Buffer | string) => {
-    const str = data.toString();
-    stdoutData += str;
+  proc.stdout?.on('data', (data: Buffer | string) => {
+    const str = data.toString()
+    stdoutData += str
     if (onOutput) {
-      onOutput(str, "stdout");
+      onOutput(str, 'stdout')
     } else {
-      console.log(`stdout: ${str}`);
+      console.log(`stdout: ${str}`)
     }
 
     // Parse progress from output
-    const progress = parseProgress(data);
+    const progress = parseProgress(data)
     if (progress) {
-      onProgress(progress);
+      onProgress(progress)
     }
-  });
+  })
 
-  proc.stderr?.on("data", (data: Buffer | string) => {
-    const str = data.toString();
-    stderrData += str;
+  proc.stderr?.on('data', (data: Buffer | string) => {
+    const str = data.toString()
+    stderrData += str
     if (onOutput) {
-      onOutput(str, "stderr");
+      onOutput(str, 'stderr')
     } else {
-      console.log(`stderr: ${str}`);
+      console.log(`stderr: ${str}`)
     }
-  });
+  })
 
-  proc.on("error", (err) => {
+  proc.on('error', (err) => {
     callback!(
       new InstallError(
         `Failed to spawn SteamCMD: ${err.message}`,
-        "SPAWN_ERROR",
-      ),
-    );
-  });
+        'SPAWN_ERROR'
+      )
+    )
+  })
 
-  proc.on("close", (code) => {
+  proc.on('close', (code) => {
     if (onOutput) {
-      onOutput(`Process exited with code ${code}\n`, "stdout");
+      onOutput(`Process exited with code ${code}\n`, 'stdout')
     } else {
-      console.log(`child process exited with code ${code}`);
+      console.log(`child process exited with code ${code}`)
     }
 
     if (code && code > 0) {
       const err = new InstallError(
         `SteamCMD exited with code ${code}`,
-        "EXIT_ERROR",
-        code,
-      );
-      err.stdout = stdoutData;
-      err.stderr = stderrData;
-      callback!(err);
+        'EXIT_ERROR',
+        code
+      )
+      err.stdout = stdoutData
+      err.stderr = stderrData
+      callback!(err)
     } else {
       onProgress({
-        phase: "complete",
+        phase: 'complete',
         percent: 100,
         bytesDownloaded: 0,
         totalBytes: 0,
-      });
-      callback!(null);
+      })
+      callback!(null)
     }
-  });
+  })
 }
 
 /**
@@ -412,9 +412,9 @@ export function install(
  */
 export function installWithProgress(
   steamCmdPath: string,
-  options: InstallOptions,
+  options: InstallOptions
 ): InstallEmitter {
-  const emitter = new EventEmitter() as InstallEmitter;
+  const emitter = new EventEmitter() as InstallEmitter
 
   // Run install in next tick to allow event binding
   process.nextTick(() => {
@@ -422,20 +422,20 @@ export function installWithProgress(
       steamCmdPath,
       {
         ...options,
-        onProgress: (progress) => emitter.emit("progress", progress),
-        onOutput: (data, type) => emitter.emit("output", data, type),
+        onProgress: (progress) => emitter.emit('progress', progress),
+        onOutput: (data, type) => emitter.emit('output', data, type),
       },
       (err) => {
         if (err) {
-          emitter.emit("error", err as InstallError);
+          emitter.emit('error', err as InstallError)
         } else {
-          emitter.emit("complete");
+          emitter.emit('complete')
         }
-      },
-    );
-  });
+      }
+    )
+  })
 
-  return emitter;
+  return emitter
 }
 
-export default install;
+export default install

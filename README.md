@@ -1,7 +1,7 @@
 # SteamCMD
 
-[![CI](https://github.com/dahlgren/node-steamcmd/actions/workflows/ci.yml/badge.svg)](https://github.com/dahlgren/node-steamcmd/actions/workflows/ci.yml)
-[![npm version](https://badge.fury.io/js/steamcmd.svg)](https://www.npmjs.com/package/steamcmd)
+[![CI](https://github.com/caleb-collar/node-steamcmd/actions/workflows/ci.yml/badge.svg)](https://github.com/caleb-collar/node-steamcmd/actions/workflows/ci.yml)
+[![npm version](https://img.shields.io/npm/v/@caleb-collar/steamcmd.svg)](https://www.npmjs.com/package/@caleb-collar/steamcmd)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 A Node.js wrapper for Valve's [SteamCMD](https://developer.valvesoftware.com/wiki/SteamCMD) tool. Download, install, and manage Steam applications programmatically.
@@ -35,7 +35,7 @@ sudo apt-get install lib32gcc-s1
 ## Installation
 
 ```bash
-npm install steamcmd
+npm install @caleb-collar/steamcmd
 ```
 
 ## Usage
@@ -45,7 +45,7 @@ npm install steamcmd
 #### Basic Installation
 
 ```javascript
-const steamcmd = require("steamcmd");
+const steamcmd = require("@caleb-collar/steamcmd");
 
 // Install a dedicated server (e.g., Counter-Strike 2)
 await steamcmd.install({
@@ -97,7 +97,7 @@ await steamcmd.install({
 #### Utility Functions
 
 ```javascript
-const steamcmd = require("steamcmd");
+const steamcmd = require("@caleb-collar/steamcmd");
 
 // Check if SteamCMD is installed
 const installed = await steamcmd.isInstalled();
@@ -148,7 +148,7 @@ await steamcmd.validate({
 #### EventEmitter Progress
 
 ```javascript
-const steamcmd = require("steamcmd");
+const steamcmd = require("@caleb-collar/steamcmd");
 
 // Create an event emitter for real-time progress
 const emitter = steamcmd.createProgressEmitter("install", {
@@ -176,7 +176,7 @@ emitter.on("complete", () => {
 #### Error Handling
 
 ```javascript
-const { SteamCmdError, DownloadError, InstallError } = require("steamcmd");
+const { SteamCmdError, DownloadError, InstallError } = require("@caleb-collar/steamcmd");
 
 try {
   await steamcmd.install({
@@ -346,7 +346,7 @@ npx steamcmd 107410 450814997 --path ./arma3
 TypeScript definitions are included:
 
 ```typescript
-import steamcmd, { SteamCmdError, InstallOptions } from "steamcmd";
+import steamcmd, { SteamCmdError, InstallOptions } from "@caleb-collar/steamcmd";
 
 const options: InstallOptions = {
   applicationId: 740,
@@ -365,12 +365,12 @@ The package supports both CommonJS and ES Modules:
 
 ```javascript
 // CommonJS
-const steamcmd = require("steamcmd");
+const steamcmd = require("@caleb-collar/steamcmd");
 
 // ES Modules
-import steamcmd from "steamcmd";
+import steamcmd from "@caleb-collar/steamcmd";
 // or with named exports
-import { install, getInfo, SteamCmdError } from "steamcmd";
+import { install, getInfo, SteamCmdError } from "@caleb-collar/steamcmd";
 ```
 
 ## Finding App IDs
@@ -382,4 +382,9 @@ Workshop IDs can be found in the URL of any Workshop item page.
 
 ## License
 
-MIT © [Björn Dahlgren](https://github.com/dahlgren)
+MIT
+
+## Credits
+
+- **Original Author:** [Björn Dahlgren](https://github.com/dahlgren) - Creator of the original node-steamcmd package
+- **Modernization:** [Caleb Collar](https://github.com/caleb-collar) - ES Modules, TypeScript definitions, Promise API, and modern Node.js support

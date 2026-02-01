@@ -176,7 +176,11 @@ emitter.on("complete", () => {
 #### Error Handling
 
 ```javascript
-const { SteamCmdError, DownloadError, InstallError } = require("@caleb-collar/steamcmd");
+const {
+  SteamCmdError,
+  DownloadError,
+  InstallError,
+} = require("@caleb-collar/steamcmd");
 
 try {
   await steamcmd.install({
@@ -346,7 +350,10 @@ npx steamcmd 107410 450814997 --path ./arma3
 TypeScript definitions are included:
 
 ```typescript
-import steamcmd, { SteamCmdError, InstallOptions } from "@caleb-collar/steamcmd";
+import steamcmd, {
+  SteamCmdError,
+  InstallOptions,
+} from "@caleb-collar/steamcmd";
 
 const options: InstallOptions = {
   applicationId: 740,

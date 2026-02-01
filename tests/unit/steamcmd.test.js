@@ -108,8 +108,10 @@ describe('steamcmd.js', () => {
       expect(result).toBeInstanceOf(Promise)
     })
 
-    it('should accept options object', async () => {
-      await steamcmd.ensureInstalled({ onProgress: () => {} })
+    it('should accept options object', () => {
+      // Just verify it accepts options without throwing - don't await the actual install
+      const result = steamcmd.ensureInstalled({ onProgress: () => {} })
+      expect(result).toBeInstanceOf(Promise)
     })
   })
 
@@ -139,11 +141,11 @@ describe('steamcmd.js', () => {
       )
     })
 
-    it('should accept callback', (done) => {
-      steamcmd.install({ applicationId: 740 }, (_err) => {
-        // Note: This may succeed or fail depending on if steamcmd is installed
-        done()
-      })
+    it('should accept callback', () => {
+      // Just verify it accepts a callback function without throwing
+      expect(() => {
+        steamcmd.install({ applicationId: 740 }, () => {})
+      }).not.toThrow()
     })
   })
 

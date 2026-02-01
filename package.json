@@ -1,24 +1,31 @@
 {
   "name": "@caleb-collar/steamcmd",
-  "version": "1.0.0-alpha.2",
+  "version": "1.1.0",
   "description": "Node.js wrapper for SteamCMD - download, install, and manage Steam applications programmatically",
-  "main": "src/steamcmd.js",
-  "module": "src/steamcmd.mjs",
-  "types": "types/steamcmd.d.ts",
+  "main": "dist/steamcmd.js",
+  "module": "dist/steamcmd.mjs",
+  "types": "dist/steamcmd.d.ts",
   "exports": {
     ".": {
       "import": {
-        "types": "./types/steamcmd.d.ts",
-        "default": "./src/steamcmd.mjs"
+        "types": "./dist/steamcmd.d.ts",
+        "default": "./dist/steamcmd.mjs"
       },
       "require": {
-        "types": "./types/steamcmd.d.ts",
-        "default": "./src/steamcmd.js"
+        "types": "./dist/steamcmd.d.ts",
+        "default": "./dist/steamcmd.js"
       }
     }
   },
   "scripts": {
-    "lint": "standard --verbose **/*.js bin/*",
+    "build": "tsc && npm run build:esm-wrapper",
+    "build:esm-wrapper": "node -e \"const fs=require('fs');fs.writeFileSync('dist/steamcmd.mjs',fs.readFileSync('src/steamcmd.mjs.template','utf8'))\"",
+    "clean": "rimraf dist docs",
+    "docs": "typedoc --out docs src/steamcmd.ts",
+    "prepublishOnly": "npm run clean && npm run build",
+    "lint": "biome check .",
+    "lint:fix": "biome check --write .",
+    "format": "biome format --write .",
     "test": "vitest run",
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage"
@@ -27,9 +34,8 @@
     "steamcmd": "bin/steamcmd"
   },
   "files": [
-    "src/",
+    "dist/",
     "bin/",
-    "types/",
     "README.md",
     "LICENSE",
     "CHANGELOG.md"
@@ -64,8 +70,13 @@
     "unzipper": "^0.12.3"
   },
   "devDependencies": {
+    "@biomejs/biome": "^2.3.13",
+    "@types/node": "^25.1.0",
+    "@types/unzipper": "^0.10.11",
     "@vitest/coverage-v8": "^4.0.18",
-    "standard": "^17.1.2",
+    "rimraf": "^6.1.2",
+    "typedoc": "^0.28.16",
+    "typescript": "^5.9.3",
     "vitest": "^4.0.18"
   }
 }

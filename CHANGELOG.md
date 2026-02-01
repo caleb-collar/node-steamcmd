@@ -7,6 +7,30 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.1.0] - 2026-01-31
+
+### Added
+
+- **Full TypeScript source**: Entire codebase converted from JavaScript to TypeScript
+- **Strict TypeScript configuration**: Enabled all strict mode checks for better type safety
+- **TSDoc documentation**: All public APIs documented with TSDoc comments
+- **API documentation generation**: `npm run docs` generates HTML documentation via TypeDoc
+
+### Changed
+
+- **Build system**: Package now compiles from TypeScript source to dist/ folder
+- **Linting**: Replaced `standard` with Biome for modern, fast linting
+- **Node.js imports**: Updated to use `node:` protocol for builtin modules
+
+### Removed
+
+- **standard linter**: Replaced with Biome (fixes eslint security vulnerability chain)
+- **Legacy JavaScript source**: Source files are now TypeScript (.ts)
+
+### Security
+
+- **Resolved**: Removed `standard` linter dependency which had eslint vulnerability chain
+
 ## [1.0.0-alpha.2] - 2026-01-31
 
 ### Added

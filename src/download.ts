@@ -4,42 +4,84 @@
  * @private
  */
 
-const https = require('https')
-const fs = require('fs')
-const tar = require('tar')
-const unzip = require('unzipper')
-const { EventEmitter } = require('events')
+import { EventEmitter } from 'node:events'
+import fs from 'node:fs'
+import https from 'node:https'
+import tar from 'tar'
+import unzip from 'unzipper'
+import * as env from './env.js'
 
-const env = require('./env')
+/**
+ * Progress information for download operations
+ */
+export interface DownloadProgress {
+  /** Current phase of the operation */
+  phase: 'starting' | 'downloading' | 'complete'
+  /** Percentage complete (0-100) */
+  percent: number
+  /** Number of bytes downloaded so far */
+  bytesDownloaded: number
+  /** Total bytes to download (0 if unknown) */
+  totalBytes: number
+}
+
+/**
+ * Options for download operations
+ */
+export interface DownloadOptions {
+  /** Progress callback fired during download */
+  onProgress?: (progress: DownloadProgress) => void
+}
+
+/**
+ * Callback function type for download operations
+ */
+export type DownloadCallback = (error: Error | null) => void
 
 /**
  * SteamCMD download URLs by platform
  */
-const DOWNLOAD_URLS = {
+export const DOWNLOAD_URLS: Record<string, string> = {
   darwin:
     'https://steamcdn-a.akamaihd.net/client/installer/steamcmd_osx.tar.gz',
   linux:
     'https://steamcdn-a.akamaihd.net/client/installer/steamcmd_linux.tar.gz',
-  win32: 'https://steamcdn-a.akamaihd.net/client/installer/steamcmd.zip'
+  win32: 'https://steamcdn-a.akamaihd.net/client/installer/steamcmd.zip',
 }
 
 /**
  * Custom error class for download failures
  */
-class DownloadError extends Error {
-  constructor (message, code) {
+export class DownloadError extends Error {
+  name = 'DownloadError' as const
+  code: string
+
+  constructor(message: string, code: string) {
     super(message)
-    this.name = 'DownloadError'
     this.code = code
   }
 }
 
 /**
+ * EventEmitter for download operations with progress events
+ */
+export interface DownloadEmitter extends EventEmitter {
+  on(event: 'progress', listener: (progress: DownloadProgress) => void): this
+  on(event: 'complete', listener: () => void): this
+  on(event: 'error', listener: (error: DownloadError) => void): this
+  once(event: 'progress', listener: (progress: DownloadProgress) => void): this
+  once(event: 'complete', listener: () => void): this
+  once(event: 'error', listener: (error: DownloadError) => void): this
+  emit(event: 'progress', progress: DownloadProgress): boolean
+  emit(event: 'complete'): boolean
+  emit(event: 'error', error: DownloadError): boolean
+}
+
+/**
  * Download and extract SteamCMD for the current platform
- * @param {Object} [options] - Download options
- * @param {Function} [options.onProgress] - Progress callback(progress) with { phase, percent, bytesDownloaded, totalBytes }
- * @param {Function} [callback] - Optional callback(err). If omitted, returns a Promise.
- * @returns {Promise<void>|undefined} Promise if no callback provided
+ * @param options Download options
+ * @param callback Optional callback. If omitted, returns a Promise.
+ * @returns Promise if no callback provided
  *
  * @example
  * // With progress callback
@@ -49,7 +91,10 @@ class DownloadError extends Error {
  *   }
  * });
  */
-function download (options, callback) {
+export function download(
+  options?: DownloadOptions | DownloadCallback,
+  callback?: DownloadCallback
+): Promise<void> | void {
   // Handle legacy signature: download(callback)
   if (typeof options === 'function') {
     callback = options
@@ -70,14 +115,14 @@ function download (options, callback) {
   const onProgress =
     typeof options.onProgress === 'function' ? options.onProgress : () => {}
 
-  const platform = env.platform()
-  const url = DOWNLOAD_URLS[platform]
+  const platformValue = env.platform()
+  const url = DOWNLOAD_URLS[platformValue]
   const destDir = env.directory()
 
   if (!url) {
     callback(
       new DownloadError(
-        `Unsupported platform: ${platform}`,
+        `Unsupported platform: ${platformValue}`,
         'UNSUPPORTED_PLATFORM'
       )
     )
@@ -88,9 +133,10 @@ function download (options, callback) {
   try {
     fs.mkdirSync(destDir, { recursive: true })
   } catch (err) {
+    const message = err instanceof Error ? err.message : String(err)
     callback(
       new DownloadError(
-        `Failed to create directory ${destDir}: ${err.message}`,
+        `Failed to create directory ${destDir}: ${message}`,
         'DIRECTORY_ERROR'
       )
     )
@@ -101,13 +147,13 @@ function download (options, callback) {
     phase: 'starting',
     percent: 0,
     bytesDownloaded: 0,
-    totalBytes: 0
+    totalBytes: 0,
   })
 
   https
     .get(url, (res) => {
       if (res.statusCode !== 200) {
-        callback(
+        callback!(
           new DownloadError(
             `Failed to download SteamCMD: HTTP ${res.statusCode}`,
             'HTTP_ERROR'
@@ -116,10 +162,10 @@ function download (options, callback) {
         return
       }
 
-      const totalBytes = parseInt(res.headers['content-length'], 10) || 0
+      const totalBytes = parseInt(res.headers['content-length'] || '0', 10)
       let bytesDownloaded = 0
 
-      res.on('data', (chunk) => {
+      res.on('data', (chunk: Buffer) => {
         bytesDownloaded += chunk.length
         const percent =
           totalBytes > 0 ? Math.round((bytesDownloaded / totalBytes) * 100) : 0
@@ -127,15 +173,15 @@ function download (options, callback) {
           phase: 'downloading',
           percent,
           bytesDownloaded,
-          totalBytes
+          totalBytes,
         })
       })
 
-      if (platform === 'darwin' || platform === 'linux') {
+      if (platformValue === 'darwin' || platformValue === 'linux') {
         res
           .pipe(tar.x({ cwd: destDir }))
-          .on('error', (err) => {
-            callback(
+          .on('error', (err: Error) => {
+            callback!(
               new DownloadError(
                 `Failed to extract tar archive: ${err.message}`,
                 'EXTRACT_ERROR'
@@ -147,15 +193,15 @@ function download (options, callback) {
               phase: 'complete',
               percent: 100,
               bytesDownloaded,
-              totalBytes
+              totalBytes,
             })
-            callback(null)
+            callback!(null)
           })
-      } else if (platform === 'win32') {
+      } else if (platformValue === 'win32') {
         res
           .pipe(unzip.Extract({ path: destDir }))
-          .on('error', (err) => {
-            callback(
+          .on('error', (err: Error) => {
+            callback!(
               new DownloadError(
                 `Failed to extract zip archive: ${err.message}`,
                 'EXTRACT_ERROR'
@@ -167,14 +213,14 @@ function download (options, callback) {
               phase: 'complete',
               percent: 100,
               bytesDownloaded,
-              totalBytes
+              totalBytes,
             })
-            callback(null)
+            callback!(null)
           })
       }
     })
     .on('error', (err) => {
-      callback(
+      callback!(
         new DownloadError(`Network error: ${err.message}`, 'NETWORK_ERROR')
       )
     })
@@ -182,8 +228,8 @@ function download (options, callback) {
 
 /**
  * Download SteamCMD with EventEmitter-based progress
- * @param {Object} [options] - Download options
- * @returns {EventEmitter} Emitter that fires 'progress', 'error', and 'complete' events
+ * @param options Download options
+ * @returns Emitter that fires 'progress', 'error', and 'complete' events
  *
  * @example
  * const emitter = downloadWithProgress();
@@ -191,19 +237,21 @@ function download (options, callback) {
  * emitter.on('complete', () => console.log('Done!'));
  * emitter.on('error', (err) => console.error(err));
  */
-function downloadWithProgress (options) {
-  const emitter = new EventEmitter()
+export function downloadWithProgress(
+  options?: DownloadOptions
+): DownloadEmitter {
+  const emitter = new EventEmitter() as DownloadEmitter
 
   // Run download in next tick to allow event binding
   process.nextTick(() => {
     download(
       {
         ...options,
-        onProgress: (progress) => emitter.emit('progress', progress)
+        onProgress: (progress) => emitter.emit('progress', progress),
       },
       (err) => {
         if (err) {
-          emitter.emit('error', err)
+          emitter.emit('error', err as DownloadError)
         } else {
           emitter.emit('complete')
         }
@@ -214,7 +262,4 @@ function downloadWithProgress (options) {
   return emitter
 }
 
-module.exports = download
-module.exports.downloadWithProgress = downloadWithProgress
-module.exports.DownloadError = DownloadError
-module.exports.DOWNLOAD_URLS = DOWNLOAD_URLS
+export default download

@@ -131,13 +131,13 @@ Transform this legacy Node.js wrapper for SteamCMD into a modern, well-tested, a
 
 **Objective:** Modernize tooling and complete TypeScript migration
 
-| Task                                   | Priority | Status  | Notes                            |
-| -------------------------------------- | -------- | ------- | -------------------------------- |
-| 10.1 Full TypeScript source conversion | MEDIUM   | ⬜ TODO | Convert src/\*.js to TypeScript  |
-| 10.2 Replace `standard` with Biome     | HIGH     | ⬜ TODO | Modern linter, fixes eslint vuln |
-| 10.3 Add strict TypeScript config      | LOW      | ⬜ TODO | Enable strict mode               |
-| 10.4 Generate API docs from TSDoc      | LOW      | ⬜ TODO | Automated documentation          |
-| 10.5 Increase test coverage to 80%+    | HIGH     | ⬜ TODO | ESM enables proper mocking       |
+| Task                                   | Priority | Status  | Notes                              |
+| -------------------------------------- | -------- | ------- | ---------------------------------- |
+| 10.1 Full TypeScript source conversion | MEDIUM   | ✅ DONE | All src/\*.ts with strict types    |
+| 10.2 Replace `standard` with Biome     | HIGH     | ✅ DONE | Modern linter, eslint vuln fixed   |
+| 10.3 Add strict TypeScript config      | LOW      | ✅ DONE | Full strict mode enabled           |
+| 10.4 Generate API docs from TSDoc      | LOW      | ✅ DONE | TypeDoc generates docs/            |
+| 10.5 Increase test coverage to 80%+    | HIGH     | 🔄 MOVE | 57.89% - requires HTTP/proc mocks  |
 
 ---
 
@@ -191,11 +191,22 @@ node-steamcmd/
 │   └── MODERNIZATION.md
 ├── bin/
 │   └── steamcmd
-├── src/
+├── dist/                    # Compiled output
 │   ├── download.js
+│   ├── download.d.ts
 │   ├── env.js
+│   ├── env.d.ts
 │   ├── install.js
-│   └── steamcmd.js
+│   ├── install.d.ts
+│   ├── steamcmd.js
+│   ├── steamcmd.d.ts
+│   └── steamcmd.mjs
+├── docs/                    # Generated API docs
+├── src/                     # TypeScript source
+│   ├── download.ts
+│   ├── env.ts
+│   ├── install.ts
+│   └── steamcmd.ts
 ├── tests/
 │   ├── unit/
 │   │   ├── env.test.js
@@ -203,16 +214,16 @@ node-steamcmd/
 │   │   └── install.test.js
 │   └── integration/
 │       └── steamcmd.test.js
-├── types/
-│   └── steamcmd.d.ts
 ├── .gitignore
 ├── .npmignore
 ├── AGENTS.md
+├── biome.json
 ├── BLUEPRINT.md
 ├── CHANGELOG.md
 ├── LICENSE
 ├── package.json
-└── README.md
+├── README.md
+└── tsconfig.json
 ```
 
 ---
@@ -223,13 +234,14 @@ The package is ready for v1.0.0 release when:
 
 1. ✅ All Phase 1-6 tasks marked complete
 2. ✅ CI passes on all supported platforms
-3. ⬜ Test coverage > 80% (currently ~60%)
+3. 🔄 Test coverage > 80% (currently ~58%, deferred)
 4. ✅ TypeScript definitions work correctly
 5. ✅ Can be installed: `npm install @caleb-collar/steamcmd`
 6. ✅ Both CLI and module API work as documented
 7. ✅ README has clear, working examples
 8. ✅ CHANGELOG documents all changes from original
-9. ⬜ Phase 9 tasks complete (production readiness)
+9. ✅ Phase 9 tasks complete (production readiness)
+10. ✅ Phase 10 tasks 10.1-10.4 complete (TypeScript, Biome, TSDoc)
 
 ---
 

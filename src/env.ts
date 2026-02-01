@@ -4,46 +4,50 @@
  * @private
  */
 
-const os = require('os')
-const path = require('path')
-const envPaths = require('env-paths')
+import os from 'node:os'
+import path from 'node:path'
+import envPaths from 'env-paths'
 
 const paths = envPaths('steamcmd', { suffix: '' })
 
 /**
  * Supported platforms for SteamCMD
  */
-const SUPPORTED_PLATFORMS = ['linux', 'darwin', 'win32']
+export const SUPPORTED_PLATFORMS: readonly string[] = [
+  'linux',
+  'darwin',
+  'win32',
+] as const
 
 /**
  * Get the SteamCMD installation directory
- * @returns {string} Path to the SteamCMD directory
+ * @returns Path to the SteamCMD directory
  */
-function directory () {
+export function directory(): string {
   return paths.data
 }
 
 /**
  * Get the current platform
- * @returns {string} The current OS platform
+ * @returns The current OS platform
  */
-function platform () {
+export function platform(): NodeJS.Platform {
   return os.platform()
 }
 
 /**
  * Check if the current platform is supported
- * @returns {boolean} True if platform is supported
+ * @returns True if platform is supported
  */
-function isPlatformSupported () {
+export function isPlatformSupported(): boolean {
   return SUPPORTED_PLATFORMS.includes(platform())
 }
 
 /**
  * Get the path to the SteamCMD executable
- * @returns {string|null} Path to executable or null if unsupported platform
+ * @returns Path to executable or null if unsupported platform
  */
-function executable () {
+export function executable(): string | null {
   const plat = platform()
 
   if (plat === 'linux' || plat === 'darwin') {
@@ -57,10 +61,10 @@ function executable () {
   return null
 }
 
-module.exports = {
+export default {
   directory,
   executable,
   platform,
   isPlatformSupported,
-  SUPPORTED_PLATFORMS
+  SUPPORTED_PLATFORMS,
 }

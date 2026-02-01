@@ -6,7 +6,9 @@
   "types": "types/steamcmd.d.ts",
   "scripts": {
     "lint": "standard --verbose **/*.js bin/*",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage"
   },
   "bin": {
     "steamcmd": "./bin/steamcmd"
@@ -48,6 +50,8 @@
     "unzipper": "^0.12.3"
   },
   "devDependencies": {
-    "standard": "^17.1.2"
+    "@vitest/coverage-v8": "^4.0.18",
+    "standard": "^17.1.2",
+    "vitest": "^4.0.18"
   }
 }

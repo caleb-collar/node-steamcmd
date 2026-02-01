@@ -66,14 +66,14 @@ Transform this legacy Node.js wrapper for SteamCMD into a modern, well-tested, a
 
 **Objective:** Comprehensive test coverage
 
-| Task                                       | Priority | Status  | Notes                 |
-| ------------------------------------------ | -------- | ------- | --------------------- |
-| 5.1 Set up Vitest testing framework        | HIGH     | ⬜ TODO |                       |
-| 5.2 Write unit tests for `env.js`          | HIGH     | ⬜ TODO | Easy, pure functions  |
-| 5.3 Write unit tests for `install.js` args | HIGH     | ⬜ TODO | `createArguments()`   |
-| 5.4 Write unit tests for `download.js`     | MEDIUM   | ⬜ TODO | Mock HTTP             |
-| 5.5 Write integration tests                | MEDIUM   | ⬜ TODO | End-to-end with mocks |
-| 5.6 Add test coverage reporting            | LOW      | ⬜ TODO | c8 or vitest coverage |
+| Task                                       | Priority | Status  | Notes                  |
+| ------------------------------------------ | -------- | ------- | ---------------------- |
+| 5.1 Set up Vitest testing framework        | HIGH     | ✅ DONE | v8 coverage            |
+| 5.2 Write unit tests for `env.js`          | HIGH     | ✅ DONE | 13 tests, 86% coverage |
+| 5.3 Write unit tests for `install.js` args | HIGH     | ✅ DONE | 42 tests               |
+| 5.4 Write unit tests for `download.js`     | MEDIUM   | ✅ DONE | 14 tests               |
+| 5.5 Write integration tests                | MEDIUM   | ✅ DONE | 23 tests               |
+| 5.6 Add test coverage reporting            | LOW      | ✅ DONE | v8 coverage provider   |
 
 ### Phase 6: CI/CD Pipeline
 

@@ -123,6 +123,9 @@ Transform this legacy Node.js wrapper for SteamCMD into a modern, well-tested, a
 | 9.3 Run `npm pkg fix` for bin script    | MEDIUM   | ⬜ TODO | CI warning on publish                 |
 | 9.4 Update CHANGELOG.md repo links      | MEDIUM   | ⬜ TODO | Point to caleb-collar repo            |
 | 9.5 Bump version to `1.0.0-alpha.2`     | HIGH     | ⬜ TODO | Current version already published     |
+| 9.6 Remove `.travis.yml`                | MEDIUM   | ⬜ TODO | Legacy CI, replaced by GitHub Actions |
+| 9.7 Remove `dependabot.yml`             | MEDIUM   | ⬜ TODO | Replaced by Renovate                  |
+| 9.8 Implement Renovate                  | MEDIUM   | ⬜ TODO | Better dependency management          |
 
 ### Phase 10: Developer Experience (v2.0)
 
@@ -179,7 +182,7 @@ node-steamcmd/
 │   ├── workflows/
 │   │   ├── ci.yml
 │   │   └── publish.yml
-│   └── dependabot.yml
+│   └── renovate.json
 ├── .agents-docs/
 │   ├── README.md
 │   ├── ARCHITECTURE.md

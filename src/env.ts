@@ -4,27 +4,27 @@
  * @private
  */
 
-import os from 'node:os'
-import path from 'node:path'
-import envPaths from 'env-paths'
+import os from "node:os";
+import path from "node:path";
+import envPaths from "env-paths";
 
-const paths = envPaths('steamcmd', { suffix: '' })
+const paths = envPaths("steamcmd", { suffix: "" });
 
 /**
  * Supported platforms for SteamCMD
  */
 export const SUPPORTED_PLATFORMS: readonly string[] = [
-  'linux',
-  'darwin',
-  'win32',
-] as const
+  "linux",
+  "darwin",
+  "win32",
+] as const;
 
 /**
  * Get the SteamCMD installation directory
  * @returns Path to the SteamCMD directory
  */
 export function directory(): string {
-  return paths.data
+  return paths.data;
 }
 
 /**
@@ -32,7 +32,7 @@ export function directory(): string {
  * @returns The current OS platform
  */
 export function platform(): NodeJS.Platform {
-  return os.platform()
+  return os.platform();
 }
 
 /**
@@ -40,7 +40,7 @@ export function platform(): NodeJS.Platform {
  * @returns True if platform is supported
  */
 export function isPlatformSupported(): boolean {
-  return SUPPORTED_PLATFORMS.includes(platform())
+  return SUPPORTED_PLATFORMS.includes(platform());
 }
 
 /**
@@ -48,17 +48,17 @@ export function isPlatformSupported(): boolean {
  * @returns Path to executable or null if unsupported platform
  */
 export function executable(): string | null {
-  const plat = platform()
+  const plat = platform();
 
-  if (plat === 'linux' || plat === 'darwin') {
-    return path.resolve(directory(), 'steamcmd.sh')
+  if (plat === "linux" || plat === "darwin") {
+    return path.resolve(directory(), "steamcmd.sh");
   }
 
-  if (plat === 'win32') {
-    return path.resolve(directory(), 'steamcmd.exe')
+  if (plat === "win32") {
+    return path.resolve(directory(), "steamcmd.exe");
   }
 
-  return null
+  return null;
 }
 
 export default {
@@ -67,4 +67,4 @@ export default {
   platform,
   isPlatformSupported,
   SUPPORTED_PLATFORMS,
-}
+};

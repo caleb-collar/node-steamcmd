@@ -131,13 +131,13 @@ Transform this legacy Node.js wrapper for SteamCMD into a modern, well-tested, a
 
 **Objective:** Modernize tooling and complete TypeScript migration
 
-| Task                                   | Priority | Status  | Notes                              |
-| -------------------------------------- | -------- | ------- | ---------------------------------- |
-| 10.1 Full TypeScript source conversion | MEDIUM   | ✅ DONE | All src/\*.ts with strict types    |
-| 10.2 Replace `standard` with Biome     | HIGH     | ✅ DONE | Modern linter, eslint vuln fixed   |
-| 10.3 Add strict TypeScript config      | LOW      | ✅ DONE | Full strict mode enabled           |
-| 10.4 Generate API docs from TSDoc      | LOW      | ✅ DONE | TypeDoc generates docs/            |
-| 10.5 Increase test coverage to 80%+    | HIGH     | 🔄 MOVE | 57.89% - requires HTTP/proc mocks  |
+| Task                                   | Priority | Status  | Notes                             |
+| -------------------------------------- | -------- | ------- | --------------------------------- |
+| 10.1 Full TypeScript source conversion | MEDIUM   | ✅ DONE | All src/\*.ts with strict types   |
+| 10.2 Replace `standard` with Biome     | HIGH     | ✅ DONE | Modern linter, eslint vuln fixed  |
+| 10.3 Add strict TypeScript config      | LOW      | ✅ DONE | Full strict mode enabled          |
+| 10.4 Generate API docs from TSDoc      | LOW      | ✅ DONE | TypeDoc generates docs/           |
+| 10.5 Increase test coverage to 80%+    | HIGH     | 🔄 MOVE | 57.89% - requires HTTP/proc mocks |
 
 ---
 

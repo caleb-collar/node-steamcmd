@@ -1,28 +1,28 @@
 #!/usr/bin/env node
 
-const { program } = require('commander')
+const { program } = require("commander");
 
-const steamcmd = require('../dist/steamcmd')
+const steamcmd = require("../dist/steamcmd");
 
 program
-  .name('steamcmd')
-  .description('Download and install Steam applications via SteamCMD')
-  .argument('<appid>', 'Steam Application ID to install')
-  .argument('[workshopid]', 'Workshop item ID (optional)')
-  .option('-u, --username <value>', 'Steam Username')
-  .option('-p, --password <value>', 'Steam Password')
-  .option('--path <value>', 'Install Path instead of CWD')
-  .option('--platform <value>', 'Install application for specific OS')
-  .option('--steamGuardCode <value>', 'Code for steam guard')
-  .parse(process.argv)
+  .name("steamcmd")
+  .description("Download and install Steam applications via SteamCMD")
+  .argument("<appid>", "Steam Application ID to install")
+  .argument("[workshopid]", "Workshop item ID (optional)")
+  .option("-u, --username <value>", "Steam Username")
+  .option("-p, --password <value>", "Steam Password")
+  .option("--path <value>", "Install Path instead of CWD")
+  .option("--platform <value>", "Install application for specific OS")
+  .option("--steamGuardCode <value>", "Code for steam guard")
+  .parse(process.argv);
 
-const args = program.args
-const options = program.opts()
+const args = program.args;
+const options = program.opts();
 
-const appId = args[0]
-const workshopId = args[1]
+const appId = args[0];
+const workshopId = args[1];
 
-const installPath = options.path || process.cwd()
+const installPath = options.path || process.cwd();
 
 steamcmd.install({
   applicationId: appId,
@@ -31,5 +31,5 @@ steamcmd.install({
   password: options.password,
   platform: options.platform,
   steamGuardCode: options.steamGuardCode,
-  workshopId
-})
+  workshopId,
+});

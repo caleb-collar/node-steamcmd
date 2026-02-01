@@ -1,5 +1,5 @@
 {
-  "name": "steamcmd",
+  "name": "@caleb-collar/steamcmd",
   "version": "1.0.0-alpha.1",
   "description": "Node.js wrapper for SteamCMD - download, install, and manage Steam applications programmatically",
   "main": "src/steamcmd.js",
@@ -48,12 +48,12 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/dahlgren/node-steamcmd.git"
+    "url": "git+https://github.com/caleb-collar/node-steamcmd.git"
   },
   "bugs": {
-    "url": "https://github.com/dahlgren/node-steamcmd/issues"
+    "url": "https://github.com/caleb-collar/node-steamcmd/issues"
   },
-  "homepage": "https://github.com/dahlgren/node-steamcmd#readme",
+  "homepage": "https://github.com/caleb-collar/node-steamcmd#readme",
   "engines": {
     "node": ">=18"
   },

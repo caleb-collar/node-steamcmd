@@ -68,6 +68,100 @@ export interface DownloadOptions {
 }
 
 /**
+ * Options for getInstalledApps() function
+ */
+export interface GetInstalledAppsOptions {
+  /** Installation directory to scan */
+  path: string;
+}
+
+/**
+ * Information about an installed Steam application
+ */
+export interface InstalledApp {
+  /** Steam application ID */
+  appId: number;
+  /** Application name */
+  name: string;
+  /** Installation directory name */
+  installDir: string | null;
+  /** Size on disk in bytes */
+  sizeOnDisk: number;
+  /** Build ID (version) */
+  buildId: number;
+  /** Last update timestamp */
+  lastUpdated: Date | null;
+  /** State flags */
+  state: number;
+}
+
+/**
+ * Options for update() function
+ */
+export interface UpdateOptions {
+  /** Steam application ID to update */
+  applicationId: number | string;
+  /** Installation directory path */
+  path?: string;
+  /** Steam username for authentication */
+  username?: string;
+  /** Steam password for authentication */
+  password?: string;
+  /** Steam Guard code for two-factor authentication */
+  steamGuardCode?: string;
+  /** Target platform for download */
+  platform?: "windows" | "macos" | "linux";
+  /** Progress callback */
+  onProgress?: (progress: Progress) => void;
+  /** Output callback */
+  onOutput?: (data: string, type: "stdout" | "stderr") => void;
+}
+
+/**
+ * Options for validate() function
+ */
+export interface ValidateOptions {
+  /** Steam application ID to validate */
+  applicationId: number | string;
+  /** Installation directory path */
+  path?: string;
+  /** Steam username for authentication */
+  username?: string;
+  /** Steam password for authentication */
+  password?: string;
+  /** Steam Guard code for two-factor authentication */
+  steamGuardCode?: string;
+  /** Progress callback */
+  onProgress?: (progress: Progress) => void;
+  /** Output callback */
+  onOutput?: (data: string, type: "stdout" | "stderr") => void;
+}
+
+/**
+ * Options for getInstalledVersion() function
+ */
+export interface GetInstalledVersionOptions {
+  /** Steam application ID */
+  applicationId: number | string;
+  /** Installation directory path */
+  path: string;
+}
+
+/**
+ * Version information for an installed application
+ */
+export interface InstalledVersion {
+  /** Steam application ID */
+  appId: number;
+  /** Application name */
+  name: string;
+  /** Build ID (version) */
+  buildId: number;
+  /** Last update timestamp */
+  lastUpdated: Date | null;
+}
+
+/**
  * Information about the SteamCMD installation
  */
 export interface SteamCmdInfo {
@@ -260,3 +354,113 @@ export function installWithProgress(
   steamCmdPath: string,
   options: InstallOptions,
 ): InstallEmitter;
+
+/**
+ * Get a list of installed Steam applications in a directory
+ *
+ * @param options - Options with path to scan
+ * @returns Promise that resolves to array of installed app information
+ *
+ * @example
+ * const apps = await steamcmd.getInstalledApps({ path: './server' });
+ * // [{ appId: 740, name: 'Counter-Strike Global Offensive - Dedicated Server', ... }]
+ */
+export function getInstalledApps(
+  options: GetInstalledAppsOptions,
+): Promise<InstalledApp[]>;
+
+/**
+ * Update an installed Steam application
+ *
+ * @param options - Update options including applicationId
+ * @returns Promise that resolves when update is complete
+ *
+ * @example
+ * await steamcmd.update({
+ *   applicationId: 740,
+ *   path: './server',
+ *   onProgress: (p) => console.log(`${p.phase}: ${p.percent}%`)
+ * });
+ */
+export function update(options: UpdateOptions): Promise<void>;
+
+/**
+ * Validate an installed Steam application
+ *
+ * @param options - Validation options including applicationId
+ * @returns Promise that resolves when validation is complete
+ *
+ * @example
+ * await steamcmd.validate({
+ *   applicationId: 740,
+ *   path: './server'
+ * });
+ */
+export function validate(options: ValidateOptions): Promise<void>;
+
+/**
+ * Get the installed version (build ID) of a Steam application
+ *
+ * @param options - Options with applicationId and path
+ * @returns Promise that resolves to version information or null if not installed
+ *
+ * @example
+ * const version = await steamcmd.getInstalledVersion({
+ *   applicationId: 740,
+ *   path: './server'
+ * });
+ * // { appId: 740, buildId: 12345678, lastUpdated: Date }
+ */
+export function getInstalledVersion(
+  options: GetInstalledVersionOptions,
+): Promise<InstalledVersion | null>;
+
+/**
+ * Operation type for createProgressEmitter
+ */
+export type OperationType = "install" | "update" | "validate";
+
+/**
+ * EventEmitter for general SteamCMD operations with progress events
+ */
+export interface ProgressEmitter extends EventEmitter {
+  on(event: "progress", listener: (progress: Progress) => void): this;
+  on(
+    event: "output",
+    listener: (data: string, type: "stdout" | "stderr") => void,
+  ): this;
+  on(event: "complete", listener: () => void): this;
+  on(event: "error", listener: (error: Error) => void): this;
+
+  once(event: "progress", listener: (progress: Progress) => void): this;
+  once(
+    event: "output",
+    listener: (data: string, type: "stdout" | "stderr") => void,
+  ): this;
+  once(event: "complete", listener: () => void): this;
+  once(event: "error", listener: (error: Error) => void): this;
+
+  emit(event: "progress", progress: Progress): boolean;
+  emit(event: "output", data: string, type: "stdout" | "stderr"): boolean;
+  emit(event: "complete"): boolean;
+  emit(event: "error", error: Error): boolean;
+}
+
+/**
+ * Create an EventEmitter for SteamCMD operations with real-time progress
+ *
+ * @param operation - Operation type ('install', 'update', 'validate')
+ * @param options - Operation options
+ * @returns EventEmitter that fires 'progress', 'output', 'error', and 'complete' events
+ *
+ * @example
+ * const emitter = steamcmd.createProgressEmitter('install', { applicationId: 740 });
+ * emitter.on('progress', (p) => console.log(`${p.phase}: ${p.percent}%`));
+ * emitter.on('output', (data, type) => console.log(`[${type}] ${data}`));
+ * emitter.on('complete', () => console.log('Done!'));
+ * emitter.on('error', (err) => console.error(err));
+ */
+export function createProgressEmitter(
+  operation: OperationType,
+  options: InstallOptions,
+): ProgressEmitter;

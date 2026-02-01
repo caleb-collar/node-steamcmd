@@ -117,6 +117,60 @@ console.log(info);
 await steamcmd.ensureInstalled({
   onProgress: (p) => console.log(`Download: ${p.percent}%`),
 });
+
+// List installed apps in a directory
+const apps = await steamcmd.getInstalledApps({ path: "./server" });
+console.log(apps);
+// [{ appId: 740, name: 'CSGO Server', buildId: 12345, ... }]
+
+// Get installed version of an app
+const version = await steamcmd.getInstalledVersion({
+  applicationId: 740,
+  path: "./server",
+});
+console.log(version);
+// { appId: 740, name: 'CSGO Server', buildId: 12345, lastUpdated: Date }
+
+// Update an existing installation
+await steamcmd.update({
+  applicationId: 740,
+  path: "./server",
+  onProgress: (p) => console.log(`Update: ${p.percent}%`),
+});
+
+// Validate an installation
+await steamcmd.validate({
+  applicationId: 740,
+  path: "./server",
+});
+```
+
+#### EventEmitter Progress
+
+```javascript
+const steamcmd = require("steamcmd");
+
+// Create an event emitter for real-time progress
+const emitter = steamcmd.createProgressEmitter("install", {
+  applicationId: 740,
+  path: "./server",
+});
+
+emitter.on("progress", (p) => {
+  console.log(`${p.phase}: ${p.percent}%`);
+});
+
+emitter.on("output", (data, type) => {
+  process.stdout.write(`[${type}] ${data}`);
+});
+
+emitter.on("error", (err) => {
+  console.error("Failed:", err.message);
+});
+
+emitter.on("complete", () => {
+  console.log("Done!");
+});
 ```
 
 #### Error Handling
@@ -196,6 +250,67 @@ Get information about the SteamCMD installation.
 
 **Returns:** `{ directory, executable, platform, isSupported }`
 
+#### `getInstalledApps(options)`
+
+List all installed Steam applications in a directory.
+
+| Option | Type     | Description                    |
+| ------ | -------- | ------------------------------ |
+| `path` | `string` | Installation directory to scan |
+
+**Returns:** `Promise<Array>` - Array of installed app info objects
+
+#### `getInstalledVersion(options)`
+
+Get the installed version of a Steam application.
+
+| Option          | Type               | Description            |
+| --------------- | ------------------ | ---------------------- |
+| `applicationId` | `number \| string` | Steam application ID   |
+| `path`          | `string`           | Installation directory |
+
+**Returns:** `Promise<Object | null>` - Version info or null if not installed
+
+#### `update(options)`
+
+Update an installed Steam application.
+
+| Option           | Type               | Description                    |
+| ---------------- | ------------------ | ------------------------------ |
+| `applicationId`  | `number \| string` | Steam application ID to update |
+| `path`           | `string`           | Installation directory         |
+| `username`       | `string`           | Steam username (optional)      |
+| `password`       | `string`           | Steam password (optional)      |
+| `steamGuardCode` | `string`           | Steam Guard code (optional)    |
+| `onProgress`     | `function`         | Progress callback (optional)   |
+
+**Returns:** `Promise<void>`
+
+#### `validate(options)`
+
+Validate an installed Steam application.
+
+| Option          | Type               | Description                      |
+| --------------- | ------------------ | -------------------------------- |
+| `applicationId` | `number \| string` | Steam application ID to validate |
+| `path`          | `string`           | Installation directory           |
+| `username`      | `string`           | Steam username (optional)        |
+| `password`      | `string`           | Steam password (optional)        |
+| `onProgress`    | `function`         | Progress callback (optional)     |
+
+**Returns:** `Promise<void>`
+
+#### `createProgressEmitter(operation, options)`
+
+Create an EventEmitter for real-time progress tracking.
+
+| Parameter   | Type     | Description                                           |
+| ----------- | -------- | ----------------------------------------------------- |
+| `operation` | `string` | Operation type: `'install'`, `'update'`, `'validate'` |
+| `options`   | `object` | Same options as `install()`                           |
+
+**Returns:** `EventEmitter` - Emits `'progress'`, `'output'`, `'error'`, and `'complete'` events
+
 ### Command Line Interface
 
 ```bash
@@ -242,6 +357,20 @@ const options: InstallOptions = {
 };
 
 await steamcmd.install(options);
+```
+
+## ES Modules
+
+The package supports both CommonJS and ES Modules:
+
+```javascript
+// CommonJS
+const steamcmd = require("steamcmd");
+
+// ES Modules
+import steamcmd from "steamcmd";
+// or with named exports
+import { install, getInfo, SteamCmdError } from "steamcmd";
 ```
 
 ## Finding App IDs

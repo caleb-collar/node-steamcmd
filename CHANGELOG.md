@@ -7,6 +7,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- **ESM module support**: Package now supports both CommonJS (`require`) and ES Modules (`import`)
+- **`getInstalledApps()`**: List all installed Steam applications in a directory
+- **`update()`**: Update an existing Steam application installation
+- **`validate()`**: Validate an installed Steam application
+- **`getInstalledVersion()`**: Get the installed version (build ID) of a Steam application
+- **`createProgressEmitter()`**: Create an EventEmitter for real-time progress tracking
+
+### Changed
+
+- **package.json**: Added `exports` field for dual CJS/ESM support
+- **package.json**: Added `module` field pointing to ESM entry point
+
 ## [1.0.0-alpha.1] - 2026-01-31
 
 ### Added

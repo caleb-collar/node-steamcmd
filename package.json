@@ -3,7 +3,20 @@
   "version": "1.0.0-alpha.1",
   "description": "Node.js wrapper for SteamCMD - download, install, and manage Steam applications programmatically",
   "main": "src/steamcmd.js",
+  "module": "src/steamcmd.mjs",
   "types": "types/steamcmd.d.ts",
+  "exports": {
+    ".": {
+      "import": {
+        "types": "./types/steamcmd.d.ts",
+        "default": "./src/steamcmd.mjs"
+      },
+      "require": {
+        "types": "./types/steamcmd.d.ts",
+        "default": "./src/steamcmd.js"
+      }
+    }
+  },
   "scripts": {
     "lint": "standard --verbose **/*.js bin/*",
     "test": "vitest run",
@@ -18,7 +31,8 @@
     "bin/",
     "types/",
     "README.md",
-    "LICENSE"
+    "LICENSE",
+    "CHANGELOG.md"
   ],
   "keywords": [
     "steam",

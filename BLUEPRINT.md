@@ -105,12 +105,12 @@ Transform this legacy Node.js wrapper for SteamCMD into a modern, well-tested, a
 
 | Task                                     | Priority | Status  | Notes                 |
 | ---------------------------------------- | -------- | ------- | --------------------- |
-| 8.1 Add ESM module support               | MEDIUM   | ⬜ TODO | Dual CJS/ESM          |
-| 8.2 Add `getInstalledApps()` function    | LOW      | ⬜ TODO | List installed apps   |
-| 8.3 Add `update()` function              | LOW      | ⬜ TODO | Update existing       |
-| 8.4 Add `validate()` function            | LOW      | ⬜ TODO | Validate installation |
-| 8.5 Add event emitter for progress       | LOW      | ⬜ TODO | Real-time progress    |
-| 8.6 Add `getInstalledVersion()` function | LOW      | ⬜ TODO | Check app version     |
+| 8.1 Add ESM module support               | MEDIUM   | ✅ DONE | Dual CJS/ESM          |
+| 8.2 Add `getInstalledApps()` function    | LOW      | ✅ DONE | List installed apps   |
+| 8.3 Add `update()` function              | LOW      | ✅ DONE | Update existing       |
+| 8.4 Add `validate()` function            | LOW      | ✅ DONE | Validate installation |
+| 8.5 Add event emitter for progress       | LOW      | ✅ DONE | Real-time progress    |
+| 8.6 Add `getInstalledVersion()` function | LOW      | ✅ DONE | Check app version     |
 
 ---
 

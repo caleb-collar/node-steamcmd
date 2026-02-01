@@ -8,6 +8,7 @@ jobs:
   publish:
     name: Publish to npm
     runs-on: ubuntu-latest
+    if: ${{ !github.event.release.prerelease }}
 
     permissions:
       contents: read

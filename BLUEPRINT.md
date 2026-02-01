@@ -20,12 +20,12 @@ Transform this legacy Node.js wrapper for SteamCMD into a modern, well-tested, a
 
 | Task                                     | Priority | Status  | Notes                                   |
 | ---------------------------------------- | -------- | ------- | --------------------------------------- |
-| 1.1 Update `package.json` metadata       | HIGH     | ⬜ TODO | Name, description, repository, keywords |
-| 1.2 Set Node.js engine requirement       | HIGH     | ⬜ TODO | `"engines": { "node": ">=18" }`         |
-| 1.3 Add repository/bugs/homepage fields  | HIGH     | ⬜ TODO | GitHub URLs                             |
-| 1.4 Update version to `1.0.0-alpha.1`    | HIGH     | ⬜ TODO | Semantic versioning start               |
-| 1.5 Create `.npmignore` or `files` field | HIGH     | ⬜ TODO | Control published files                 |
-| 1.6 Create `LICENSE` file                | HIGH     | ⬜ TODO | MIT license text                        |
+| 1.1 Update `package.json` metadata       | HIGH     | ✅ DONE | Name, description, repository, keywords |
+| 1.2 Set Node.js engine requirement       | HIGH     | ✅ DONE | `"engines": { "node": ">=18" }`         |
+| 1.3 Add repository/bugs/homepage fields  | HIGH     | ✅ DONE | GitHub URLs                             |
+| 1.4 Update version to `1.0.0-alpha.1`    | HIGH     | ✅ DONE | Semantic versioning start               |
+| 1.5 Create `.npmignore` or `files` field | HIGH     | ✅ DONE | Control published files                 |
+| 1.6 Create `LICENSE` file                | HIGH     | ✅ DONE | MIT license text                        |
 
 ### Phase 2: Security & Dependencies
 

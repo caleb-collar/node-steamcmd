@@ -1,7 +1,7 @@
 {
   "name": "steamcmd",
-  "version": "0.0.0",
-  "description": "Helper library for SteamCMD",
+  "version": "1.0.0-alpha.1",
+  "description": "Node.js wrapper for SteamCMD - download, install, and manage Steam applications programmatically",
   "main": "src/steamcmd.js",
   "scripts": {
     "lint": "standard --verbose **/*.js bin/*",
@@ -10,11 +10,35 @@
   "bin": {
     "steamcmd": "./bin/steamcmd"
   },
+  "files": [
+    "src/",
+    "bin/",
+    "README.md",
+    "LICENSE"
+  ],
   "keywords": [
-    "steam"
+    "steam",
+    "steamcmd",
+    "valve",
+    "game-server",
+    "dedicated-server",
+    "workshop",
+    "download",
+    "install"
   ],
   "author": "Björn Dahlgren",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/dahlgren/node-steamcmd.git"
+  },
+  "bugs": {
+    "url": "https://github.com/dahlgren/node-steamcmd/issues"
+  },
+  "homepage": "https://github.com/dahlgren/node-steamcmd#readme",
+  "engines": {
+    "node": ">=18"
+  },
   "dependencies": {
     "commander": "^2.2.0",
     "path-extra": "^0.3.0",

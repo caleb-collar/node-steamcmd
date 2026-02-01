@@ -131,6 +131,8 @@ describe('steamcmd.js', () => {
     it('should return Promise when no callback', () => {
       const result = steamcmd.install({ applicationId: 740 })
       expect(result).toBeInstanceOf(Promise)
+      // Catch to avoid unhandled rejection (install triggers ensureInstalled)
+      result.catch(() => {})
     })
 
     it('should throw for null options', async () => {
@@ -147,9 +149,9 @@ describe('steamcmd.js', () => {
 
     it('should accept callback', () => {
       // Just verify it accepts a callback function without throwing
-      expect(() => {
-        steamcmd.install({ applicationId: 740 }, () => {})
-      }).not.toThrow()
+      // The callback-style still returns the promise, so catch it
+      const result = steamcmd.install({ applicationId: 740 }, () => {})
+      if (result) result.catch(() => {})
     })
   })
 

@@ -79,14 +79,14 @@ Transform this legacy Node.js wrapper for SteamCMD into a modern, well-tested, a
 
 **Objective:** Automated testing and publishing
 
-| Task                                       | Priority | Status  | Notes                   |
-| ------------------------------------------ | -------- | ------- | ----------------------- |
-| 6.1 Create `.github/workflows/ci.yml`      | HIGH     | ⬜ TODO | Test on push/PR         |
-| 6.2 Test on multiple Node versions         | HIGH     | ⬜ TODO | 18, 20, 22              |
-| 6.3 Test on multiple OS                    | MEDIUM   | ⬜ TODO | Ubuntu, Windows, macOS  |
-| 6.4 Create `.github/workflows/publish.yml` | HIGH     | ⬜ TODO | Publish on release      |
-| 6.5 Set up Dependabot                      | MEDIUM   | ⬜ TODO | Auto dependency updates |
-| 6.6 Add branch protection rules            | LOW      | ⬜ TODO | Require CI pass         |
+| Task                                       | Priority | Status  | Notes                             |
+| ------------------------------------------ | -------- | ------- | --------------------------------- |
+| 6.1 Create `.github/workflows/ci.yml`      | HIGH     | ✅ DONE | Test on push/PR                   |
+| 6.2 Test on multiple Node versions         | HIGH     | ✅ DONE | 18, 20, 22                        |
+| 6.3 Test on multiple OS                    | MEDIUM   | ✅ DONE | Ubuntu, Windows, macOS            |
+| 6.4 Create `.github/workflows/publish.yml` | HIGH     | ✅ DONE | Publish on release                |
+| 6.5 Set up Dependabot                      | MEDIUM   | ✅ DONE | Auto dependency updates           |
+| 6.6 Add branch protection rules            | LOW      | ⬜ TODO | Configure in GitHub repo settings |
 
 ### Phase 7: Documentation
 

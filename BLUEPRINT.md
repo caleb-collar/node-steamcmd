@@ -58,8 +58,8 @@ Transform this legacy Node.js wrapper for SteamCMD into a modern, well-tested, a
 
 | Task                                    | Priority | Status  | Notes                |
 | --------------------------------------- | -------- | ------- | -------------------- |
-| 4.1 Create `types/steamcmd.d.ts`        | HIGH     | ⬜ TODO | Type definitions     |
-| 4.2 Add `types` field to package.json   | HIGH     | ⬜ TODO |                      |
+| 4.1 Create `types/steamcmd.d.ts`        | HIGH     | ✅ DONE | Type definitions     |
+| 4.2 Add `types` field to package.json   | HIGH     | ✅ DONE |                      |
 | 4.3 Consider full TypeScript conversion | LOW      | ⬜ TODO | Future consideration |
 
 ### Phase 5: Testing

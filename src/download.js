@@ -4,33 +4,33 @@
  * @private
  */
 
-const https = require("https");
-const fs = require("fs");
-const tar = require("tar");
-const unzip = require("unzipper");
-const { EventEmitter } = require("events");
+const https = require('https')
+const fs = require('fs')
+const tar = require('tar')
+const unzip = require('unzipper')
+const { EventEmitter } = require('events')
 
-const env = require("./env");
+const env = require('./env')
 
 /**
  * SteamCMD download URLs by platform
  */
 const DOWNLOAD_URLS = {
   darwin:
-    "https://steamcdn-a.akamaihd.net/client/installer/steamcmd_osx.tar.gz",
+    'https://steamcdn-a.akamaihd.net/client/installer/steamcmd_osx.tar.gz',
   linux:
-    "https://steamcdn-a.akamaihd.net/client/installer/steamcmd_linux.tar.gz",
-  win32: "https://steamcdn-a.akamaihd.net/client/installer/steamcmd.zip",
-};
+    'https://steamcdn-a.akamaihd.net/client/installer/steamcmd_linux.tar.gz',
+  win32: 'https://steamcdn-a.akamaihd.net/client/installer/steamcmd.zip'
+}
 
 /**
  * Custom error class for download failures
  */
 class DownloadError extends Error {
-  constructor(message, code) {
-    super(message);
-    this.name = "DownloadError";
-    this.code = code;
+  constructor (message, code) {
+    super(message)
+    this.name = 'DownloadError'
+    this.code = code
   }
 }
 
@@ -49,60 +49,60 @@ class DownloadError extends Error {
  *   }
  * });
  */
-function download(options, callback) {
+function download (options, callback) {
   // Handle legacy signature: download(callback)
-  if (typeof options === "function") {
-    callback = options;
-    options = {};
+  if (typeof options === 'function') {
+    callback = options
+    options = {}
   }
-  options = options || {};
+  options = options || {}
 
   // Support Promise-based usage
-  if (typeof callback !== "function") {
+  if (typeof callback !== 'function') {
     return new Promise((resolve, reject) => {
       download(options, (err) => {
-        if (err) reject(err);
-        else resolve();
-      });
-    });
+        if (err) reject(err)
+        else resolve()
+      })
+    })
   }
 
   const onProgress =
-    typeof options.onProgress === "function" ? options.onProgress : () => {};
+    typeof options.onProgress === 'function' ? options.onProgress : () => {}
 
-  const platform = env.platform();
-  const url = DOWNLOAD_URLS[platform];
-  const destDir = env.directory();
+  const platform = env.platform()
+  const url = DOWNLOAD_URLS[platform]
+  const destDir = env.directory()
 
   if (!url) {
     callback(
       new DownloadError(
         `Unsupported platform: ${platform}`,
-        "UNSUPPORTED_PLATFORM",
-      ),
-    );
-    return;
+        'UNSUPPORTED_PLATFORM'
+      )
+    )
+    return
   }
 
   // Ensure destination directory exists
   try {
-    fs.mkdirSync(destDir, { recursive: true });
+    fs.mkdirSync(destDir, { recursive: true })
   } catch (err) {
     callback(
       new DownloadError(
         `Failed to create directory ${destDir}: ${err.message}`,
-        "DIRECTORY_ERROR",
-      ),
-    );
-    return;
+        'DIRECTORY_ERROR'
+      )
+    )
+    return
   }
 
   onProgress({
-    phase: "starting",
+    phase: 'starting',
     percent: 0,
     bytesDownloaded: 0,
-    totalBytes: 0,
-  });
+    totalBytes: 0
+  })
 
   https
     .get(url, (res) => {
@@ -110,74 +110,74 @@ function download(options, callback) {
         callback(
           new DownloadError(
             `Failed to download SteamCMD: HTTP ${res.statusCode}`,
-            "HTTP_ERROR",
-          ),
-        );
-        return;
+            'HTTP_ERROR'
+          )
+        )
+        return
       }
 
-      const totalBytes = parseInt(res.headers["content-length"], 10) || 0;
-      let bytesDownloaded = 0;
+      const totalBytes = parseInt(res.headers['content-length'], 10) || 0
+      let bytesDownloaded = 0
 
-      res.on("data", (chunk) => {
-        bytesDownloaded += chunk.length;
+      res.on('data', (chunk) => {
+        bytesDownloaded += chunk.length
         const percent =
-          totalBytes > 0 ? Math.round((bytesDownloaded / totalBytes) * 100) : 0;
+          totalBytes > 0 ? Math.round((bytesDownloaded / totalBytes) * 100) : 0
         onProgress({
-          phase: "downloading",
+          phase: 'downloading',
           percent,
           bytesDownloaded,
-          totalBytes,
-        });
-      });
+          totalBytes
+        })
+      })
 
-      if (platform === "darwin" || platform === "linux") {
+      if (platform === 'darwin' || platform === 'linux') {
         res
           .pipe(tar.x({ cwd: destDir }))
-          .on("error", (err) => {
+          .on('error', (err) => {
             callback(
               new DownloadError(
                 `Failed to extract tar archive: ${err.message}`,
-                "EXTRACT_ERROR",
-              ),
-            );
+                'EXTRACT_ERROR'
+              )
+            )
           })
-          .on("finish", () => {
+          .on('finish', () => {
             onProgress({
-              phase: "complete",
+              phase: 'complete',
               percent: 100,
               bytesDownloaded,
-              totalBytes,
-            });
-            callback(null);
-          });
-      } else if (platform === "win32") {
+              totalBytes
+            })
+            callback(null)
+          })
+      } else if (platform === 'win32') {
         res
           .pipe(unzip.Extract({ path: destDir }))
-          .on("error", (err) => {
+          .on('error', (err) => {
             callback(
               new DownloadError(
                 `Failed to extract zip archive: ${err.message}`,
-                "EXTRACT_ERROR",
-              ),
-            );
+                'EXTRACT_ERROR'
+              )
+            )
           })
-          .on("close", () => {
+          .on('close', () => {
             onProgress({
-              phase: "complete",
+              phase: 'complete',
               percent: 100,
               bytesDownloaded,
-              totalBytes,
-            });
-            callback(null);
-          });
+              totalBytes
+            })
+            callback(null)
+          })
       }
     })
-    .on("error", (err) => {
+    .on('error', (err) => {
       callback(
-        new DownloadError(`Network error: ${err.message}`, "NETWORK_ERROR"),
-      );
-    });
+        new DownloadError(`Network error: ${err.message}`, 'NETWORK_ERROR')
+      )
+    })
 }
 
 /**
@@ -191,30 +191,30 @@ function download(options, callback) {
  * emitter.on('complete', () => console.log('Done!'));
  * emitter.on('error', (err) => console.error(err));
  */
-function downloadWithProgress(options) {
-  const emitter = new EventEmitter();
+function downloadWithProgress (options) {
+  const emitter = new EventEmitter()
 
   // Run download in next tick to allow event binding
   process.nextTick(() => {
     download(
       {
         ...options,
-        onProgress: (progress) => emitter.emit("progress", progress),
+        onProgress: (progress) => emitter.emit('progress', progress)
       },
       (err) => {
         if (err) {
-          emitter.emit("error", err);
+          emitter.emit('error', err)
         } else {
-          emitter.emit("complete");
+          emitter.emit('complete')
         }
-      },
-    );
-  });
+      }
+    )
+  })
 
-  return emitter;
+  return emitter
 }
 
-module.exports = download;
-module.exports.downloadWithProgress = downloadWithProgress;
-module.exports.DownloadError = DownloadError;
-module.exports.DOWNLOAD_URLS = DOWNLOAD_URLS;
+module.exports = download
+module.exports.downloadWithProgress = downloadWithProgress
+module.exports.DownloadError = DownloadError
+module.exports.DOWNLOAD_URLS = DOWNLOAD_URLS

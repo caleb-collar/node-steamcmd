@@ -6,30 +6,29 @@
  * @see https://github.com/dahlgren/node-steamcmd
  */
 
-const fs = require("fs");
-const path = require("path");
-const { promisify } = require("util");
-const { EventEmitter } = require("events");
+const fs = require('fs')
+const path = require('path')
+const { promisify } = require('util')
+const { EventEmitter } = require('events')
 
-const download = require("./download");
-const env = require("./env");
-const install = require("./install");
+const download = require('./download')
+const env = require('./env')
+const install = require('./install')
 
-const access = promisify(fs.access);
-const readdir = promisify(fs.readdir);
-const readFile = promisify(fs.readFile);
-const stat = promisify(fs.stat);
+const access = promisify(fs.access)
+const readdir = promisify(fs.readdir)
+const readFile = promisify(fs.readFile)
 
 /**
  * Custom error class for SteamCMD operations
  */
 class SteamCmdError extends Error {
-  constructor(message, code, cause) {
-    super(message);
-    this.name = "SteamCmdError";
-    this.code = code;
+  constructor (message, code, cause) {
+    super(message)
+    this.name = 'SteamCmdError'
+    this.code = code
     if (cause) {
-      this.cause = cause;
+      this.cause = cause
     }
   }
 }
@@ -38,15 +37,15 @@ class SteamCmdError extends Error {
  * Check if SteamCMD is installed and executable
  * @returns {Promise<boolean>} True if SteamCMD is available
  */
-async function isInstalled() {
-  const executablePath = env.executable();
-  if (!executablePath) return false;
+async function isInstalled () {
+  const executablePath = env.executable()
+  if (!executablePath) return false
 
   try {
-    await access(executablePath, (fs.constants || fs).X_OK);
-    return true;
+    await access(executablePath, (fs.constants || fs).X_OK)
+    return true
   } catch {
-    return false;
+    return false
   }
 }
 
@@ -57,22 +56,22 @@ async function isInstalled() {
  * @returns {Promise<void>}
  * @throws {SteamCmdError} If download fails
  */
-async function ensureInstalled(options) {
-  options = options || {};
-  const installed = await isInstalled();
-  if (installed) return;
+async function ensureInstalled (options) {
+  options = options || {}
+  const installed = await isInstalled()
+  if (installed) return
 
-  console.log("SteamCMD needs to be installed");
+  console.log('SteamCMD needs to be installed')
 
   try {
-    await download({ onProgress: options.onProgress });
-    console.log("SteamCMD was installed");
+    await download({ onProgress: options.onProgress })
+    console.log('SteamCMD was installed')
   } catch (err) {
     throw new SteamCmdError(
-      "Failed to install SteamCMD",
-      "INSTALL_FAILED",
-      err,
-    );
+      'Failed to install SteamCMD',
+      'INSTALL_FAILED',
+      err
+    )
   }
 }
 
@@ -106,41 +105,41 @@ async function ensureInstalled(options) {
  *   if (err) console.error(err);
  * });
  */
-function steamCmdInstall(options, callback) {
+function steamCmdInstall (options, callback) {
   // Support Promise-based usage
-  if (typeof callback !== "function") {
-    return steamCmdInstallAsync(options);
+  if (typeof callback !== 'function') {
+    return steamCmdInstallAsync(options)
   }
 
   // Legacy callback-based usage
   steamCmdInstallAsync(options)
     .then(() => callback(null))
-    .catch((err) => callback(err));
+    .catch((err) => callback(err))
 }
 
 /**
  * Async implementation of install
  * @private
  */
-async function steamCmdInstallAsync(options) {
+async function steamCmdInstallAsync (options) {
   // Validate options early
-  if (!options || typeof options !== "object") {
-    throw new SteamCmdError("Options must be an object", "INVALID_OPTIONS");
+  if (!options || typeof options !== 'object') {
+    throw new SteamCmdError('Options must be an object', 'INVALID_OPTIONS')
   }
 
   // Ensure SteamCMD is installed (pass download progress)
-  await ensureInstalled({ onProgress: options.onProgress });
+  await ensureInstalled({ onProgress: options.onProgress })
 
   // Run installation
-  const executablePath = env.executable();
+  const executablePath = env.executable()
   try {
-    await install(executablePath, options);
+    await install(executablePath, options)
   } catch (err) {
     throw new SteamCmdError(
       `Installation failed: ${err.message}`,
-      "RUN_FAILED",
-      err,
-    );
+      'RUN_FAILED',
+      err
+    )
   }
 }
 
@@ -148,13 +147,13 @@ async function steamCmdInstallAsync(options) {
  * Get information about the SteamCMD installation
  * @returns {Object} SteamCMD paths and status
  */
-function getInfo() {
+function getInfo () {
   return {
     directory: env.directory(),
     executable: env.executable(),
     platform: env.platform(),
-    isSupported: env.isPlatformSupported(),
-  };
+    isSupported: env.isPlatformSupported()
+  }
 }
 
 /**
@@ -163,20 +162,20 @@ function getInfo() {
  * @returns {Promise<Object>} Parsed manifest data
  * @private
  */
-async function parseAppManifest(manifestPath) {
-  const content = await readFile(manifestPath, "utf8");
-  const result = {};
+async function parseAppManifest (manifestPath) {
+  const content = await readFile(manifestPath, 'utf8')
+  const result = {}
 
   // Simple VDF parser for app manifests
-  const lines = content.split("\n");
+  const lines = content.split('\n')
   for (const line of lines) {
-    const match = line.match(/"(\w+)"\s+"([^"]*)"/);
+    const match = line.match(/"(\w+)"\s+"([^"]*)"/)
     if (match) {
-      result[match[1]] = match[2];
+      result[match[1]] = match[2]
     }
   }
 
-  return result;
+  return result
 }
 
 /**
@@ -189,41 +188,41 @@ async function parseAppManifest(manifestPath) {
  * const apps = await steamcmd.getInstalledApps({ path: './server' });
  * // [{ appId: 740, name: 'Counter-Strike Global Offensive - Dedicated Server', ... }]
  */
-async function getInstalledApps(options) {
+async function getInstalledApps (options) {
   if (!options || !options.path) {
-    throw new SteamCmdError("path option is required", "INVALID_OPTIONS");
+    throw new SteamCmdError('path option is required', 'INVALID_OPTIONS')
   }
 
-  const steamappsDir = path.join(options.path, "steamapps");
-  const apps = [];
+  const steamappsDir = path.join(options.path, 'steamapps')
+  const apps = []
 
   try {
-    await access(steamappsDir, fs.constants.R_OK);
+    await access(steamappsDir, fs.constants.R_OK)
   } catch {
     // No steamapps directory, return empty array
-    return apps;
+    return apps
   }
 
   try {
-    const files = await readdir(steamappsDir);
+    const files = await readdir(steamappsDir)
     const manifestFiles = files.filter(
-      (f) => f.startsWith("appmanifest_") && f.endsWith(".acf"),
-    );
+      (f) => f.startsWith('appmanifest_') && f.endsWith('.acf')
+    )
 
     for (const file of manifestFiles) {
       try {
-        const manifest = await parseAppManifest(path.join(steamappsDir, file));
+        const manifest = await parseAppManifest(path.join(steamappsDir, file))
         apps.push({
           appId: parseInt(manifest.appid, 10),
-          name: manifest.name || "Unknown",
+          name: manifest.name || 'Unknown',
           installDir: manifest.installdir || null,
-          sizeOnDisk: parseInt(manifest.SizeOnDisk || "0", 10),
-          buildId: parseInt(manifest.buildid || "0", 10),
+          sizeOnDisk: parseInt(manifest.SizeOnDisk || '0', 10),
+          buildId: parseInt(manifest.buildid || '0', 10),
           lastUpdated: manifest.LastUpdated
             ? new Date(parseInt(manifest.LastUpdated, 10) * 1000)
             : null,
-          state: parseInt(manifest.StateFlags || "0", 10),
-        });
+          state: parseInt(manifest.StateFlags || '0', 10)
+        })
       } catch {
         // Skip invalid manifest files
       }
@@ -232,7 +231,7 @@ async function getInstalledApps(options) {
     // Error reading directory
   }
 
-  return apps;
+  return apps
 }
 
 /**
@@ -255,16 +254,16 @@ async function getInstalledApps(options) {
  *   onProgress: (p) => console.log(`${p.phase}: ${p.percent}%`)
  * });
  */
-async function update(options) {
+async function update (options) {
   if (!options || !options.applicationId) {
     throw new SteamCmdError(
-      "applicationId option is required",
-      "INVALID_OPTIONS",
-    );
+      'applicationId option is required',
+      'INVALID_OPTIONS'
+    )
   }
 
   // update is essentially the same as install - SteamCMD handles both
-  return steamCmdInstallAsync(options);
+  return steamCmdInstallAsync(options)
 }
 
 /**
@@ -285,16 +284,16 @@ async function update(options) {
  *   path: './server'
  * });
  */
-async function validate(options) {
+async function validate (options) {
   if (!options || !options.applicationId) {
     throw new SteamCmdError(
-      "applicationId option is required",
-      "INVALID_OPTIONS",
-    );
+      'applicationId option is required',
+      'INVALID_OPTIONS'
+    )
   }
 
   // validate is the same as install - SteamCMD always validates
-  return steamCmdInstallAsync(options);
+  return steamCmdInstallAsync(options)
 }
 
 /**
@@ -311,35 +310,35 @@ async function validate(options) {
  * });
  * // { appId: 740, buildId: 12345678, lastUpdated: Date }
  */
-async function getInstalledVersion(options) {
+async function getInstalledVersion (options) {
   if (!options || !options.applicationId || !options.path) {
     throw new SteamCmdError(
-      "applicationId and path options are required",
-      "INVALID_OPTIONS",
-    );
+      'applicationId and path options are required',
+      'INVALID_OPTIONS'
+    )
   }
 
-  const appId = Number(options.applicationId);
+  const appId = Number(options.applicationId)
   const manifestPath = path.join(
     options.path,
-    "steamapps",
-    `appmanifest_${appId}.acf`,
-  );
+    'steamapps',
+    `appmanifest_${appId}.acf`
+  )
 
   try {
-    await access(manifestPath, fs.constants.R_OK);
-    const manifest = await parseAppManifest(manifestPath);
+    await access(manifestPath, fs.constants.R_OK)
+    const manifest = await parseAppManifest(manifestPath)
 
     return {
       appId: parseInt(manifest.appid, 10),
-      name: manifest.name || "Unknown",
-      buildId: parseInt(manifest.buildid || "0", 10),
+      name: manifest.name || 'Unknown',
+      buildId: parseInt(manifest.buildid || '0', 10),
       lastUpdated: manifest.LastUpdated
         ? new Date(parseInt(manifest.LastUpdated, 10) * 1000)
-        : null,
-    };
+        : null
+    }
   } catch {
-    return null;
+    return null
   }
 }
 
@@ -356,32 +355,32 @@ async function getInstalledVersion(options) {
  * emitter.on('complete', () => console.log('Done!'));
  * emitter.on('error', (err) => console.error(err));
  */
-function createProgressEmitter(operation, options) {
-  const emitter = new EventEmitter();
+function createProgressEmitter (operation, options) {
+  const emitter = new EventEmitter()
 
   process.nextTick(async () => {
     try {
       // Ensure SteamCMD is installed first
       await ensureInstalled({
-        onProgress: (progress) => emitter.emit("progress", progress),
-      });
+        onProgress: (progress) => emitter.emit('progress', progress)
+      })
 
       // Run the operation
-      const executablePath = env.executable();
+      const executablePath = env.executable()
       const operationOptions = {
         ...options,
-        onProgress: (progress) => emitter.emit("progress", progress),
-        onOutput: (data, type) => emitter.emit("output", data, type),
-      };
+        onProgress: (progress) => emitter.emit('progress', progress),
+        onOutput: (data, type) => emitter.emit('output', data, type)
+      }
 
-      await install(executablePath, operationOptions);
-      emitter.emit("complete");
+      await install(executablePath, operationOptions)
+      emitter.emit('complete')
     } catch (err) {
-      emitter.emit("error", err);
+      emitter.emit('error', err)
     }
-  });
+  })
 
-  return emitter;
+  return emitter
 }
 
 module.exports = {
@@ -401,5 +400,5 @@ module.exports = {
   InstallError: install.InstallError,
   // Re-export progress helpers
   downloadWithProgress: download.downloadWithProgress,
-  installWithProgress: install.installWithProgress,
-};
+  installWithProgress: install.installWithProgress
+}

@@ -46,11 +46,11 @@ Transform this legacy Node.js wrapper for SteamCMD into a modern, well-tested, a
 
 | Task                                     | Priority | Status  | Notes                      |
 | ---------------------------------------- | -------- | ------- | -------------------------- |
-| 3.1 Add Promise support to `install()`   | HIGH     | ⬜ TODO | Keep callback support      |
-| 3.2 Convert internal code to async/await | MEDIUM   | ⬜ TODO | Clean up callback hell     |
-| 3.3 Add proper error handling            | HIGH     | ⬜ TODO | Descriptive error messages |
-| 3.4 Add input validation                 | MEDIUM   | ⬜ TODO | Validate options           |
-| 3.5 Add progress events/callbacks        | LOW      | ⬜ TODO | Download/install progress  |
+| 3.1 Add Promise support to `install()`   | HIGH     | ✅ DONE | Keep callback support      |
+| 3.2 Convert internal code to async/await | MEDIUM   | ✅ DONE | Clean up callback hell     |
+| 3.3 Add proper error handling            | HIGH     | ✅ DONE | Descriptive error messages |
+| 3.4 Add input validation                 | MEDIUM   | ✅ DONE | Validate options           |
+| 3.5 Add progress events/callbacks        | LOW      | ✅ DONE | Download/install progress  |
 
 ### Phase 4: TypeScript Support
 

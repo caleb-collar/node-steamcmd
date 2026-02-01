@@ -56,11 +56,11 @@ Transform this legacy Node.js wrapper for SteamCMD into a modern, well-tested, a
 
 **Objective:** First-class TypeScript experience
 
-| Task                                    | Priority | Status  | Notes                |
-| --------------------------------------- | -------- | ------- | -------------------- |
-| 4.1 Create `types/steamcmd.d.ts`        | HIGH     | ✅ DONE | Type definitions     |
-| 4.2 Add `types` field to package.json   | HIGH     | ✅ DONE |                      |
-| 4.3 Consider full TypeScript conversion | LOW      | ⬜ TODO | Future consideration |
+| Task                                    | Priority | Status  | Notes             |
+| --------------------------------------- | -------- | ------- | ----------------- |
+| 4.1 Create `types/steamcmd.d.ts`        | HIGH     | ✅ DONE | Type definitions  |
+| 4.2 Add `types` field to package.json   | HIGH     | ✅ DONE |                   |
+| 4.3 Consider full TypeScript conversion | LOW      | ✅ DONE | Moved to Phase 10 |
 
 ### Phase 5: Testing
 
@@ -111,6 +111,29 @@ Transform this legacy Node.js wrapper for SteamCMD into a modern, well-tested, a
 | 8.4 Add `validate()` function            | LOW      | ✅ DONE | Validate installation |
 | 8.5 Add event emitter for progress       | LOW      | ✅ DONE | Real-time progress    |
 | 8.6 Add `getInstalledVersion()` function | LOW      | ✅ DONE | Check app version     |
+
+### Phase 9: Production Readiness
+
+**Objective:** Address blockers for stable 1.0.0 release
+
+| Task                                    | Priority | Status  | Notes                                 |
+| --------------------------------------- | -------- | ------- | ------------------------------------- |
+| 9.1 Increase test coverage to 80%+      | HIGH     | ⬜ TODO | download.js at 37%, install.js at 60% |
+| 9.2 Fix `standard` eslint security vuln | HIGH     | ⬜ TODO | Upstream eslint <9.26.0 vuln chain    |
+| 9.3 Run `npm pkg fix` for bin script    | MEDIUM   | ⬜ TODO | CI warning on publish                 |
+| 9.4 Update CHANGELOG.md repo links      | MEDIUM   | ⬜ TODO | Point to caleb-collar repo            |
+| 9.5 Bump version to `1.0.0-alpha.2`     | HIGH     | ⬜ TODO | Current version already published     |
+
+### Phase 10: Developer Experience (v2.0)
+
+**Objective:** Modernize tooling and complete TypeScript migration
+
+| Task                                   | Priority | Status  | Notes                            |
+| -------------------------------------- | -------- | ------- | -------------------------------- |
+| 10.1 Full TypeScript source conversion | MEDIUM   | ⬜ TODO | Convert src/\*.js to TypeScript  |
+| 10.2 Replace `standard` with Biome     | MEDIUM   | ⬜ TODO | Modern linter/formatter, no vuln |
+| 10.3 Add strict TypeScript config      | LOW      | ⬜ TODO | Enable strict mode               |
+| 10.4 Generate API docs from TSDoc      | LOW      | ⬜ TODO | Automated documentation          |
 
 ---
 
@@ -196,12 +219,13 @@ The package is ready for v1.0.0 release when:
 
 1. ✅ All Phase 1-6 tasks marked complete
 2. ✅ CI passes on all supported platforms
-3. ✅ Test coverage > 80%
+3. ⬜ Test coverage > 80% (currently ~60%)
 4. ✅ TypeScript definitions work correctly
-5. ✅ Can be installed: `npm install steamcmd`
+5. ✅ Can be installed: `npm install @caleb-collar/steamcmd`
 6. ✅ Both CLI and module API work as documented
 7. ✅ README has clear, working examples
 8. ✅ CHANGELOG documents all changes from original
+9. ⬜ Phase 9 tasks complete (production readiness)
 
 ---
 

@@ -59,13 +59,14 @@ node-steamcmd/
 
 ## Dependencies
 
-| Package         | Current Version | Purpose                   | Status                |
-| --------------- | --------------- | ------------------------- | --------------------- |
-| commander       | ^2.2.0          | CLI argument parsing      | ⚠️ Very outdated      |
-| path-extra      | ^0.3.0          | Platform data directories | ⚠️ Consider replacing |
-| tarball-extract | 0.0.6           | Extract .tar.gz archives  | ⚠️ Very outdated      |
-| unzipper        | ^0.10.5         | Extract .zip archives     | ✅ Okay               |
-| standard        | ^10.0.2         | Linting (dev)             | ⚠️ Outdated           |
+| Package   | Current Version | Purpose                   | Status            |
+| --------- | --------------- | ------------------------- | ----------------- |
+| commander | ^12.1.0         | CLI argument parsing      | ✅ Current        |
+| env-paths | ^2.2.1          | Platform data directories | ✅ Current        |
+| tar       | ^7.4.3          | Extract .tar.gz archives  | ✅ Current        |
+| unzipper  | ^0.12.3         | Extract .zip archives     | ✅ Current        |
+| standard  | ^17.1.2         | Linting (dev)             | ⚠️ Has vuln chain |
+| vitest    | ^4.0.18         | Testing framework (dev)   | ✅ Current        |
 
 ## Common Tasks
 
@@ -79,7 +80,8 @@ node bin/steamcmd [appid] [workshopid] --path ./install
 
 ```bash
 npm run lint    # Run linter
-npm test        # Run tests (currently not implemented)
+npm test        # Run tests
+npm run test:coverage  # Run tests with coverage report
 ```
 
 ### Publishing
@@ -89,13 +91,64 @@ npm version patch|minor|major
 npm publish
 ```
 
+## Pre-Commit Checklist
+
+Before committing changes that affect functionality or prepare for release:
+
+- [ ] **Version Bump** — Follow [Semantic Versioning](https://semver.org/):
+  - `patch` (1.0.x): Bug fixes, documentation updates
+  - `minor` (1.x.0): New features, backward-compatible changes
+  - `major` (x.0.0): Breaking changes
+- [ ] **Update CHANGELOG.md** — Document changes under `[Unreleased]` section
+- [ ] **Run Tests** — Ensure `npm test` passes
+- [ ] **Run Lint** — Ensure `npm run lint` passes
+- [ ] **Check Coverage** — Aim for >80% coverage
+
+## Release Workflow
+
+After completing a phase in the BLUEPRINT and all tests pass:
+
+1. **Bump version** using semantic versioning:
+
+   ```bash
+   npm version patch|minor|major  # or prerelease: npm version prerelease --preid=alpha
+   ```
+
+2. **Push tags** to origin:
+
+   ```bash
+   git push origin master --tags
+   ```
+
+3. **Create GitHub release** using gh CLI:
+
+   ```bash
+   # For stable releases
+   gh release create v$(node -p "require('./package.json').version") \
+     --title "v$(node -p "require('./package.json').version")" \
+     --notes-file CHANGELOG.md
+
+   # For prereleases (alpha, beta, rc)
+   gh release create v$(node -p "require('./package.json').version") \
+     --title "v$(node -p "require('./package.json').version")" \
+     --notes-file CHANGELOG.md \
+     --prerelease
+   ```
+
+4. **Monitor CI** for successful npm publish:
+   ```bash
+   gh run watch
+   ```
+
+> **Note:** The publish workflow automatically triggers on release creation and publishes to npm with the appropriate tag (alpha, beta, rc, or latest).
+
 ## Important Notes
 
-1. **No Tests Exist** — Tests need to be created from scratch
-2. **Callback Hell** — Async code uses nested callbacks, not Promises
-3. **HTTP URLs** — Download URLs use HTTP, not HTTPS (security concern)
-4. **No Error Handling** — Many edge cases are not handled
-5. **No CI/CD** — No automated testing or publishing pipeline
+1. **Test Coverage** — Current coverage is ~60%, target is 80%+
+2. **Dual API** — Supports both Promise and callback patterns
+3. **Dual Module** — Supports both ESM and CommonJS imports
+4. **CI/CD Active** — GitHub Actions runs tests on push/PR, publishes on release
+5. **TypeScript Ready** — Type definitions available in `types/steamcmd.d.ts`
 
 ## External Resources
 

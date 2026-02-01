@@ -1,8 +1,15 @@
+/**
+ * @module steamcmd/install
+ * @description Spawns SteamCMD processes to install applications and workshop items
+ * @private
+ */
+
 const childProcess = require("child_process");
 const { EventEmitter } = require("events");
 
 /**
  * Custom error class for installation failures
+ * @extends Error
  */
 class InstallError extends Error {
   constructor(message, code, exitCode) {

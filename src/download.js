@@ -1,3 +1,9 @@
+/**
+ * @module steamcmd/download
+ * @description Downloads and extracts SteamCMD for the current platform
+ * @private
+ */
+
 const https = require("https");
 const fs = require("fs");
 const tar = require("tar");

@@ -1,3 +1,9 @@
+/**
+ * @module steamcmd/env
+ * @description Platform detection and path resolution for SteamCMD
+ * @private
+ */
+
 const os = require("os");
 const path = require("path");
 const envPaths = require("env-paths");

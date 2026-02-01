@@ -1,3 +1,11 @@
+/**
+ * @module steamcmd
+ * @description Node.js wrapper for SteamCMD - download, install, and manage Steam applications
+ * @author Björn Dahlgren
+ * @license MIT
+ * @see https://github.com/dahlgren/node-steamcmd
+ */
+
 const fs = require("fs");
 const { promisify } = require("util");
 

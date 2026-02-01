@@ -94,10 +94,10 @@ Transform this legacy Node.js wrapper for SteamCMD into a modern, well-tested, a
 
 | Task                                      | Priority | Status  | Notes                   |
 | ----------------------------------------- | -------- | ------- | ----------------------- |
-| 7.1 Update README.md with modern examples | HIGH     | ⬜ TODO | async/await examples    |
-| 7.2 Create CHANGELOG.md                   | HIGH     | ⬜ TODO | Keep a changelog format |
-| 7.3 Add CONTRIBUTING.md                   | LOW      | ⬜ TODO | Contribution guidelines |
-| 7.4 Add JSDoc comments to source          | MEDIUM   | ⬜ TODO | API documentation       |
+| 7.1 Update README.md with modern examples | HIGH     | ✅ DONE | async/await examples    |
+| 7.2 Create CHANGELOG.md                   | HIGH     | ✅ DONE | Keep a changelog format |
+| 7.3 Add CONTRIBUTING.md                   | LOW      | ✅ DONE | Contribution guidelines |
+| 7.4 Add JSDoc comments to source          | MEDIUM   | ✅ DONE | API documentation       |
 
 ### Phase 8: Future Enhancements
 

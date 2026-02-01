@@ -33,12 +33,12 @@ Transform this legacy Node.js wrapper for SteamCMD into a modern, well-tested, a
 
 | Task                                      | Priority | Status  | Notes                      |
 | ----------------------------------------- | -------- | ------- | -------------------------- |
-| 2.1 Switch download URLs to HTTPS         | CRITICAL | ⬜ TODO | Security fix               |
-| 2.2 Replace `tarball-extract` with `tar`  | HIGH     | ⬜ TODO | Maintained package         |
-| 2.3 Replace `path-extra` with `env-paths` | HIGH     | ⬜ TODO | Modern alternative         |
-| 2.4 Update `commander` to v12+            | HIGH     | ⬜ TODO | Breaking changes to handle |
-| 2.5 Update `unzipper` to latest           | MEDIUM   | ⬜ TODO |                            |
-| 2.6 Update `standard` to v17+             | MEDIUM   | ⬜ TODO | Dev dependency             |
+| 2.1 Switch download URLs to HTTPS         | CRITICAL | ✅ DONE | Security fix               |
+| 2.2 Replace `tarball-extract` with `tar`  | HIGH     | ✅ DONE | Maintained package         |
+| 2.3 Replace `path-extra` with `env-paths` | HIGH     | ✅ DONE | Modern alternative         |
+| 2.4 Update `commander` to v12+            | HIGH     | ✅ DONE | Breaking changes to handle |
+| 2.5 Update `unzipper` to latest           | MEDIUM   | ✅ DONE |                            |
+| 2.6 Update `standard` to v17+             | MEDIUM   | ✅ DONE | Dev dependency             |
 
 ### Phase 3: API Modernization
 

@@ -1,7 +1,7 @@
-var childProcess = require('child_process')
+const childProcess = require('child_process')
 
 function createArguments (options) {
-  var args = []
+  const args = []
 
   // Force platform type for download
   if (options.platform) {
@@ -49,7 +49,7 @@ function createArguments (options) {
 }
 
 function install (steamCmdPath, options, callback) {
-  var process = childProcess.execFile(steamCmdPath, createArguments(options))
+  const process = childProcess.execFile(steamCmdPath, createArguments(options))
 
   process.stdout.on('data', function (data) {
     console.log('stdout: ' + data)

@@ -40,12 +40,12 @@
     "node": ">=18"
   },
   "dependencies": {
-    "commander": "^2.2.0",
-    "path-extra": "^0.3.0",
-    "tarball-extract": "0.0.6",
-    "unzipper": "^0.10.5"
+    "commander": "^12.1.0",
+    "env-paths": "^2.2.1",
+    "tar": "^7.4.3",
+    "unzipper": "^0.12.3"
   },
   "devDependencies": {
-    "standard": "^10.0.2"
+    "standard": "^17.1.2"
   }
 }

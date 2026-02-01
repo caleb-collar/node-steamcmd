@@ -1,8 +1,8 @@
-var fs = require('fs')
+const fs = require('fs')
 
-var download = require('./download')
-var env = require('./env')
-var install = require('./install')
+const download = require('./download')
+const env = require('./env')
+const install = require('./install')
 
 function steamCmdInstall (options, callback) {
   fs.access(env.executable(), (fs.constants || fs).X_OK, function (accessError) {

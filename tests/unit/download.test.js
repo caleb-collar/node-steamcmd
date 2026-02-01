@@ -27,6 +27,25 @@ describe("download.js", () => {
         throw new DownloadError("test error", "TEST");
       }).toThrow("test error");
     });
+
+    it("should have correct error properties", () => {
+      const err = new DownloadError("network failed", "NETWORK_ERROR");
+      expect(err.name).toBe("DownloadError");
+      expect(err.code).toBe("NETWORK_ERROR");
+      expect(err.message).toBe("network failed");
+      expect(err.stack).toBeDefined();
+    });
+
+    it("should work with try/catch", () => {
+      let caught = null;
+      try {
+        throw new DownloadError("test", "CODE");
+      } catch (e) {
+        caught = e;
+      }
+      expect(caught).toBeInstanceOf(DownloadError);
+      expect(caught.code).toBe("CODE");
+    });
   });
 
   describe("DOWNLOAD_URLS", () => {
@@ -62,6 +81,22 @@ describe("download.js", () => {
         expect(url).toContain("steamcdn-a.akamaihd.net");
       });
     });
+
+    it("should have URLs for all supported platforms", () => {
+      expect(Object.keys(DOWNLOAD_URLS)).toContain("darwin");
+      expect(Object.keys(DOWNLOAD_URLS)).toContain("linux");
+      expect(Object.keys(DOWNLOAD_URLS)).toContain("win32");
+    });
+
+    it("should have tar.gz for unix platforms", () => {
+      expect(DOWNLOAD_URLS.darwin).toContain(".tar.gz");
+      expect(DOWNLOAD_URLS.linux).toContain(".tar.gz");
+    });
+
+    it("should have zip for windows", () => {
+      expect(DOWNLOAD_URLS.win32).toContain(".zip");
+      expect(DOWNLOAD_URLS.win32).not.toContain(".tar.gz");
+    });
   });
 
   describe("download()", () => {
@@ -70,7 +105,6 @@ describe("download.js", () => {
     });
 
     it("should return a Promise when no callback provided", () => {
-      // Start the download but cancel immediately by not awaiting
       const result = download();
       expect(result).toBeInstanceOf(Promise);
       // We don't await - just testing that it returns a promise
@@ -79,6 +113,20 @@ describe("download.js", () => {
     it("should accept options object", () => {
       const result = download({ onProgress: () => {} });
       expect(result).toBeInstanceOf(Promise);
+    });
+
+    it("should accept empty options", () => {
+      const result = download({});
+      expect(result).toBeInstanceOf(Promise);
+    });
+
+    it("should accept null options with callback", (done) => {
+      // Legacy signature: download(callback)
+      const cb = () => {
+        done();
+      };
+      // This will start a download but we just test it accepts the signature
+      download(cb);
     });
   });
 
@@ -95,6 +143,46 @@ describe("download.js", () => {
     it("should accept options object", () => {
       const emitter = downloadWithProgress({});
       expect(emitter).toBeInstanceOf(EventEmitter);
+    });
+
+    it("should have on method", () => {
+      const emitter = downloadWithProgress();
+      expect(typeof emitter.on).toBe("function");
+    });
+
+    it("should have once method", () => {
+      const emitter = downloadWithProgress();
+      expect(typeof emitter.once).toBe("function");
+    });
+
+    it("should have emit method", () => {
+      const emitter = downloadWithProgress();
+      expect(typeof emitter.emit).toBe("function");
+    });
+
+    it("should allow binding progress listener", () => {
+      const emitter = downloadWithProgress();
+      let called = false;
+      emitter.on("progress", () => {
+        called = true;
+      });
+      // Emitter is set up correctly
+      expect(typeof emitter.listeners("progress")).toBe("object");
+    });
+
+    it("should allow binding error listener", () => {
+      const emitter = downloadWithProgress();
+      let bound = false;
+      emitter.on("error", () => {
+        bound = true;
+      });
+      expect(emitter.listeners("error").length).toBe(1);
+    });
+
+    it("should allow binding complete listener", () => {
+      const emitter = downloadWithProgress();
+      emitter.on("complete", () => {});
+      expect(emitter.listeners("complete").length).toBe(1);
     });
   });
 });

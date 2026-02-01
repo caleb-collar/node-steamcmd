@@ -1,6 +1,6 @@
 {
   "name": "@caleb-collar/steamcmd",
-  "version": "1.0.0-alpha.1",
+  "version": "1.0.0-alpha.2",
   "description": "Node.js wrapper for SteamCMD - download, install, and manage Steam applications programmatically",
   "main": "src/steamcmd.js",
   "module": "src/steamcmd.mjs",
@@ -24,7 +24,7 @@
     "test:coverage": "vitest run --coverage"
   },
   "bin": {
-    "steamcmd": "./bin/steamcmd"
+    "steamcmd": "bin/steamcmd"
   },
   "files": [
     "src/",

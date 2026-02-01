@@ -116,16 +116,16 @@ Transform this legacy Node.js wrapper for SteamCMD into a modern, well-tested, a
 
 **Objective:** Address blockers for stable 1.0.0 release
 
-| Task                                    | Priority | Status  | Notes                                 |
-| --------------------------------------- | -------- | ------- | ------------------------------------- |
-| 9.1 Increase test coverage to 80%+      | HIGH     | ⬜ TODO | download.js at 37%, install.js at 60% |
-| 9.2 Fix `standard` eslint security vuln | HIGH     | ⬜ TODO | Upstream eslint <9.26.0 vuln chain    |
-| 9.3 Run `npm pkg fix` for bin script    | MEDIUM   | ⬜ TODO | CI warning on publish                 |
-| 9.4 Update CHANGELOG.md repo links      | MEDIUM   | ⬜ TODO | Point to caleb-collar repo            |
-| 9.5 Bump version to `1.0.0-alpha.2`     | HIGH     | ⬜ TODO | Current version already published     |
-| 9.6 Remove `.travis.yml`                | MEDIUM   | ⬜ TODO | Legacy CI, replaced by GitHub Actions |
-| 9.7 Remove `dependabot.yml`             | MEDIUM   | ⬜ TODO | Replaced by Renovate                  |
-| 9.8 Implement Renovate                  | MEDIUM   | ⬜ TODO | Better dependency management          |
+| Task                                    | Priority | Status  | Notes                                        |
+| --------------------------------------- | -------- | ------- | -------------------------------------------- |
+| 9.1 Increase test coverage to 80%+      | HIGH     | 🔄 MOVE | Blocked by CJS mocking; deferred to Phase 10 |
+| 9.2 Fix `standard` eslint security vuln | HIGH     | 🔄 MOVE | Requires Phase 10 (replace standard)         |
+| 9.3 Run `npm pkg fix` for bin script    | MEDIUM   | ✅ DONE | Fixed bin path                               |
+| 9.4 Update CHANGELOG.md repo links      | MEDIUM   | ✅ DONE | Point to caleb-collar repo                   |
+| 9.5 Bump version to `1.0.0-alpha.2`     | HIGH     | ✅ DONE | Ready for release                            |
+| 9.6 Remove `.travis.yml`                | MEDIUM   | ✅ DONE | Legacy CI, replaced by GitHub Actions        |
+| 9.7 Remove `dependabot.yml`             | MEDIUM   | ✅ DONE | Replaced by Renovate                         |
+| 9.8 Implement Renovate                  | MEDIUM   | ✅ DONE | .github/renovate.json created                |
 
 ### Phase 10: Developer Experience (v2.0)
 
@@ -134,9 +134,10 @@ Transform this legacy Node.js wrapper for SteamCMD into a modern, well-tested, a
 | Task                                   | Priority | Status  | Notes                            |
 | -------------------------------------- | -------- | ------- | -------------------------------- |
 | 10.1 Full TypeScript source conversion | MEDIUM   | ⬜ TODO | Convert src/\*.js to TypeScript  |
-| 10.2 Replace `standard` with Biome     | MEDIUM   | ⬜ TODO | Modern linter/formatter, no vuln |
+| 10.2 Replace `standard` with Biome     | HIGH     | ⬜ TODO | Modern linter, fixes eslint vuln |
 | 10.3 Add strict TypeScript config      | LOW      | ⬜ TODO | Enable strict mode               |
 | 10.4 Generate API docs from TSDoc      | LOW      | ⬜ TODO | Automated documentation          |
+| 10.5 Increase test coverage to 80%+    | HIGH     | ⬜ TODO | ESM enables proper mocking       |
 
 ---
 

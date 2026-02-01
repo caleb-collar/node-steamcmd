@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.0.0-alpha.2] - 2026-01-31
+
 ### Added
 
 - **ESM module support**: Package now supports both CommonJS (`require`) and ES Modules (`import`)
@@ -15,11 +17,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **`validate()`**: Validate an installed Steam application
 - **`getInstalledVersion()`**: Get the installed version (build ID) of a Steam application
 - **`createProgressEmitter()`**: Create an EventEmitter for real-time progress tracking
+- **Renovate**: Replaced Dependabot with Renovate for better dependency management
 
 ### Changed
 
 - **package.json**: Added `exports` field for dual CJS/ESM support
 - **package.json**: Added `module` field pointing to ESM entry point
+- **package.json**: Fixed bin path format (removed leading `./`)
+
+### Removed
+
+- **Travis CI**: Removed legacy `.travis.yml` (replaced by GitHub Actions)
+- **Dependabot**: Removed `dependabot.yml` (replaced by Renovate)
+
+### Security
+
+- **Known Issue**: `standard` linter depends on eslint <9.26.0 which has a moderate severity vulnerability (GHSA-p5wg-g6qr-c7cg). This only affects development and does not impact published package. Will be resolved in v2.0 by migrating to Biome.
 
 ## [1.0.0-alpha.1] - 2026-01-31
 
@@ -136,6 +149,7 @@ try {
 }
 ```
 
-[Unreleased]: https://github.com/dahlgren/node-steamcmd/compare/v1.0.0-alpha.1...HEAD
-[1.0.0-alpha.1]: https://github.com/dahlgren/node-steamcmd/compare/v0.3.1...v1.0.0-alpha.1
-[0.3.1]: https://github.com/dahlgren/node-steamcmd/releases/tag/v0.3.1
+[Unreleased]: https://github.com/caleb-collar/node-steamcmd/compare/v1.0.0-alpha.2...HEAD
+[1.0.0-alpha.2]: https://github.com/caleb-collar/node-steamcmd/compare/v1.0.0-alpha.1...v1.0.0-alpha.2
+[1.0.0-alpha.1]: https://github.com/caleb-collar/node-steamcmd/compare/v0.3.1...v1.0.0-alpha.1
+[0.3.1]: https://github.com/caleb-collar/node-steamcmd/releases/tag/v0.3.1

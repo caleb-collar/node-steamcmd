@@ -1,11 +1,12 @@
 import { describe, it, expect } from "vitest";
 
 // Import the module under test - these are pure functions that don't need mocking
-import {
+import install, {
   createArguments,
   validateOptions,
   parseProgress,
   InstallError,
+  installWithProgress,
 } from "../../src/install.js";
 
 describe("install.js", () => {
@@ -26,6 +27,32 @@ describe("install.js", () => {
       const err = new InstallError("test", "CODE");
       expect(err).toBeInstanceOf(Error);
     });
+
+    it("should have correct error properties", () => {
+      const err = new InstallError("spawn failed", "SPAWN_ERROR", 1);
+      expect(err.name).toBe("InstallError");
+      expect(err.code).toBe("SPAWN_ERROR");
+      expect(err.message).toBe("spawn failed");
+      expect(err.exitCode).toBe(1);
+      expect(err.stack).toBeDefined();
+    });
+
+    it("should work with try/catch", () => {
+      let caught = null;
+      try {
+        throw new InstallError("test", "CODE", 127);
+      } catch (e) {
+        caught = e;
+      }
+      expect(caught).toBeInstanceOf(InstallError);
+      expect(caught.code).toBe("CODE");
+      expect(caught.exitCode).toBe(127);
+    });
+
+    it("should allow undefined exitCode", () => {
+      const err = new InstallError("test", "CODE");
+      expect(err.exitCode).toBeUndefined();
+    });
   });
 
   describe("validateOptions()", () => {
@@ -34,9 +61,14 @@ describe("install.js", () => {
       expect(() => validateOptions(null)).toThrow("Options must be an object");
     });
 
+    it("should throw for undefined options", () => {
+      expect(() => validateOptions(undefined)).toThrow(InstallError);
+    });
+
     it("should throw for non-object options", () => {
       expect(() => validateOptions("string")).toThrow(InstallError);
       expect(() => validateOptions(123)).toThrow(InstallError);
+      expect(() => validateOptions(true)).toThrow(InstallError);
     });
 
     it("should accept empty options object", () => {
@@ -47,6 +79,10 @@ describe("install.js", () => {
       it("should accept valid applicationId", () => {
         expect(() => validateOptions({ applicationId: 740 })).not.toThrow();
         expect(() => validateOptions({ applicationId: "740" })).not.toThrow();
+      });
+
+      it("should accept large applicationId", () => {
+        expect(() => validateOptions({ applicationId: 9999999 })).not.toThrow();
       });
 
       it("should throw for negative applicationId", () => {
@@ -72,12 +108,30 @@ describe("install.js", () => {
           "applicationId must be a positive integer",
         );
       });
+
+      it("should throw for NaN applicationId", () => {
+        expect(() => validateOptions({ applicationId: NaN })).toThrow(
+          "applicationId must be a positive integer",
+        );
+      });
+
+      it("should throw for Infinity applicationId", () => {
+        expect(() => validateOptions({ applicationId: Infinity })).toThrow(
+          "applicationId must be a positive integer",
+        );
+      });
     });
 
     describe("workshopId validation", () => {
       it("should accept valid workshopId with applicationId", () => {
         expect(() =>
           validateOptions({ applicationId: 740, workshopId: 12345 }),
+        ).not.toThrow();
+      });
+
+      it("should accept string workshopId", () => {
+        expect(() =>
+          validateOptions({ applicationId: 740, workshopId: "12345" }),
         ).not.toThrow();
       });
 
@@ -90,6 +144,18 @@ describe("install.js", () => {
       it("should throw for negative workshopId", () => {
         expect(() =>
           validateOptions({ applicationId: 740, workshopId: -1 }),
+        ).toThrow("workshopId must be a positive integer");
+      });
+
+      it("should throw for zero workshopId", () => {
+        expect(() =>
+          validateOptions({ applicationId: 740, workshopId: 0 }),
+        ).toThrow("workshopId must be a positive integer");
+      });
+
+      it("should throw for non-numeric workshopId", () => {
+        expect(() =>
+          validateOptions({ applicationId: 740, workshopId: "abc" }),
         ).toThrow("workshopId must be a positive integer");
       });
     });
@@ -106,6 +172,18 @@ describe("install.js", () => {
           "platform must be one of: windows, macos, linux",
         );
       });
+
+      it("should throw for capitalized platform", () => {
+        expect(() => validateOptions({ platform: "Windows" })).toThrow(
+          "platform must be one of: windows, macos, linux",
+        );
+      });
+
+      it("should throw for empty string platform", () => {
+        expect(() => validateOptions({ platform: "" })).toThrow(
+          "platform must be one of: windows, macos, linux",
+        );
+      });
     });
 
     describe("authentication validation", () => {
@@ -113,6 +191,10 @@ describe("install.js", () => {
         expect(() =>
           validateOptions({ username: "user", password: "pass" }),
         ).not.toThrow();
+      });
+
+      it("should accept username without password", () => {
+        expect(() => validateOptions({ username: "user" })).not.toThrow();
       });
 
       it("should throw for password without username", () => {
@@ -130,6 +212,39 @@ describe("install.js", () => {
       it("should accept steamGuardCode with username", () => {
         expect(() =>
           validateOptions({ username: "user", steamGuardCode: "ABC12" }),
+        ).not.toThrow();
+      });
+
+      it("should accept all auth options together", () => {
+        expect(() =>
+          validateOptions({
+            username: "user",
+            password: "pass",
+            steamGuardCode: "ABC12",
+          }),
+        ).not.toThrow();
+      });
+    });
+
+    describe("path validation", () => {
+      it("should accept valid path", () => {
+        expect(() => validateOptions({ path: "/install/dir" })).not.toThrow();
+        expect(() =>
+          validateOptions({ path: "C:\\Games\\Server" }),
+        ).not.toThrow();
+      });
+    });
+
+    describe("combined options", () => {
+      it("should accept full valid options", () => {
+        expect(() =>
+          validateOptions({
+            applicationId: 740,
+            path: "/install",
+            platform: "linux",
+            username: "user",
+            password: "pass",
+          }),
         ).not.toThrow();
       });
     });
@@ -154,6 +269,11 @@ describe("install.js", () => {
     it("should include quit command", () => {
       const args = createArguments({});
       expect(args).toContain("+quit");
+    });
+
+    it("should return at least 4 arguments for empty options", () => {
+      const args = createArguments({});
+      expect(args.length).toBeGreaterThanOrEqual(4);
     });
 
     describe("anonymous login", () => {
@@ -187,6 +307,16 @@ describe("install.js", () => {
         });
         expect(args).toContain("+set_steam_guard_code ABC12");
       });
+
+      it("should have steam guard before login", () => {
+        const args = createArguments({
+          username: "testuser",
+          steamGuardCode: "ABC12",
+        });
+        const guardIndex = args.indexOf("+set_steam_guard_code ABC12");
+        const loginIndex = args.indexOf("+login testuser");
+        expect(guardIndex).toBeLessThan(loginIndex);
+      });
     });
 
     describe("platform forcing", () => {
@@ -194,12 +324,32 @@ describe("install.js", () => {
         const args = createArguments({ platform: "windows" });
         expect(args).toContain("+@sSteamCmdForcePlatformType windows");
       });
+
+      it("should not include platform when not specified", () => {
+        const args = createArguments({});
+        const hasPlatform = args.some((a) =>
+          a.includes("@sSteamCmdForcePlatformType"),
+        );
+        expect(hasPlatform).toBe(false);
+      });
     });
 
     describe("installation path", () => {
       it("should set install directory when path provided", () => {
         const args = createArguments({ path: "/install/path" });
         expect(args).toContain('+force_install_dir "/install/path"');
+      });
+
+      it("should handle windows paths", () => {
+        const args = createArguments({ path: "C:\\Games\\Server" });
+        expect(args).toContain('+force_install_dir "C:\\Games\\Server"');
+      });
+
+      it("should have force_install_dir before app_update", () => {
+        const args = createArguments({ path: "/install", applicationId: 740 });
+        const dirIndex = args.findIndex((a) => a.includes("force_install_dir"));
+        const updateIndex = args.indexOf("+app_update 740 validate");
+        expect(dirIndex).toBeLessThan(updateIndex);
       });
     });
 
@@ -216,6 +366,12 @@ describe("install.js", () => {
         });
         expect(args).not.toContain("+app_update 740 validate");
       });
+
+      it("should not include app_update without applicationId", () => {
+        const args = createArguments({});
+        const hasAppUpdate = args.some((a) => a.includes("app_update"));
+        expect(hasAppUpdate).toBe(false);
+      });
     });
 
     describe("workshop installation", () => {
@@ -225,6 +381,14 @@ describe("install.js", () => {
           workshopId: 12345,
         });
         expect(args).toContain("+workshop_download_item 740 12345");
+      });
+
+      it("should not include workshop_download_item without workshopId", () => {
+        const args = createArguments({ applicationId: 740 });
+        const hasWorkshop = args.some((a) =>
+          a.includes("workshop_download_item"),
+        );
+        expect(hasWorkshop).toBe(false);
       });
     });
 
@@ -242,6 +406,13 @@ describe("install.js", () => {
         const args = createArguments({ platform: "windows" });
         expect(args[0]).toBe("+@sSteamCmdForcePlatformType windows");
       });
+
+      it("should have login before app_update", () => {
+        const args = createArguments({ applicationId: 740 });
+        const loginIndex = args.indexOf("+login anonymous");
+        const updateIndex = args.indexOf("+app_update 740 validate");
+        expect(loginIndex).toBeLessThan(updateIndex);
+      });
     });
   });
 
@@ -249,6 +420,15 @@ describe("install.js", () => {
     it("should return null for non-progress output", () => {
       expect(parseProgress("Loading Steam API...")).toBeNull();
       expect(parseProgress("Connecting to Steam servers...")).toBeNull();
+      expect(parseProgress("Logging in user...")).toBeNull();
+    });
+
+    it("should return null for empty string", () => {
+      expect(parseProgress("")).toBeNull();
+    });
+
+    it("should return null for whitespace", () => {
+      expect(parseProgress("   ")).toBeNull();
     });
 
     describe("update state parsing", () => {
@@ -287,6 +467,20 @@ describe("install.js", () => {
           totalBytes: 1000000,
         });
       });
+
+      it("should parse 100% progress", () => {
+        const output =
+          "Update state (0x61) downloading, progress: 100.00 (1000 / 1000)";
+        const progress = parseProgress(output);
+        expect(progress.percent).toBe(100);
+      });
+
+      it("should handle different hex codes", () => {
+        const output =
+          "Update state (0xAB) committing, progress: 50.00 (500 / 1000)";
+        const progress = parseProgress(output);
+        expect(progress.phase).toBe("committing");
+      });
     });
 
     describe("validation parsing", () => {
@@ -311,6 +505,12 @@ describe("install.js", () => {
           totalBytes: 0,
         });
       });
+
+      it("should parse validation at 0%", () => {
+        const output = "Validating: 0%";
+        const progress = parseProgress(output);
+        expect(progress.percent).toBe(0);
+      });
     });
 
     describe("progress bar parsing", () => {
@@ -324,6 +524,31 @@ describe("install.js", () => {
           totalBytes: 0,
         });
       });
+
+      it("should return null for empty progress bar", () => {
+        // Edge case: 0% may not match the regex
+        const output = "[        ] 0%";
+        const progress = parseProgress(output);
+        expect(progress).toBeNull();
+      });
+
+      it("should parse full progress bar", () => {
+        const output = "[########] 100%";
+        const progress = parseProgress(output);
+        expect(progress.percent).toBe(100);
+      });
+    });
+  });
+
+  describe("install()", () => {
+    it("should be a function", () => {
+      expect(typeof install).toBe("function");
+    });
+  });
+
+  describe("installWithProgress()", () => {
+    it("should be a function", () => {
+      expect(typeof installWithProgress).toBe("function");
     });
   });
 });

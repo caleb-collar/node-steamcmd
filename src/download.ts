@@ -7,7 +7,7 @@
 import { EventEmitter } from 'node:events'
 import fs from 'node:fs'
 import https from 'node:https'
-import tar from 'tar'
+import * as tar from 'tar'
 import unzip from 'unzipper'
 import * as env from './env.js'
 

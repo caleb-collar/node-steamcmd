@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.1.1] - 2026-02-03
+
+### Fixed
+
+- **Critical Bug**: Fixed TypeScript/CommonJS interop issue with `tar` package that caused crashes on Linux/macOS during SteamCMD installation
+  - Changed `import tar from 'tar'` to `import * as tar from 'tar'` in `src/download.ts`
+  - This prevents the compiled code from incorrectly trying to access `tar.default.x()` which doesn't exist
+  - The `tar` package exports its API directly without a default export
+  - Resolves "Cannot read properties of undefined (reading 'x')" error during tar.gz extraction
+
 ## [1.1.0] - 2026-01-31
 
 ### Added
